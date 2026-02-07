@@ -1,9 +1,13 @@
 @import "tailwindcss";
 
 :root {
-  --hs-cyan: #00f6ff;
-  --hs-purple: #a855f7;
+  /* Degen dopamine palette (no purple) */
   --hs-green: #00ff85;
+  --hs-lime: #b6ff00;
+  --hs-cyan: #00f6ff;
+  --hs-hot: #ff2bd6;
+  --hs-amber: #ffb800;
+  --hs-red: #ff3d3d;
   --hs-gray: #a1a1aa;
 
   color-scheme: dark;
@@ -25,7 +29,7 @@ body {
     Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
   background:
     radial-gradient(1100px 650px at 10% 10%, rgba(0, 246, 255, 0.10) 0%, rgba(0, 0, 0, 0) 60%),
-    radial-gradient(900px 700px at 85% 25%, rgba(168, 85, 247, 0.10) 0%, rgba(0, 0, 0, 0) 65%),
+    radial-gradient(900px 700px at 85% 25%, rgba(182, 255, 0, 0.10) 0%, rgba(0, 0, 0, 0) 65%),
     linear-gradient(180deg, #000000 0%, #061023 100%);
   color: rgba(255, 255, 255, 0.92);
 }

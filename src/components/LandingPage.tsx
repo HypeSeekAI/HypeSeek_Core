@@ -133,7 +133,7 @@ function SectionHeading({
     <div className="mx-auto max-w-3xl text-center">
       {kicker ? (
         <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium text-white/70">
-          <Sparkles className="h-4 w-4 text-[var(--hs-purple)]" />
+          <Sparkles className="h-4 w-4 text-[var(--hs-hot)]" />
           {kicker}
         </div>
       ) : null}
@@ -224,7 +224,7 @@ export function LandingPage() {
                   <span className="bg-gradient-to-r from-white via-white to-[var(--hs-cyan)] bg-clip-text text-transparent">
                     Hype
                   </span>
-                  <span className="bg-gradient-to-r from-[var(--hs-cyan)] to-[var(--hs-purple)] bg-clip-text text-transparent">
+                  <span className="bg-gradient-to-r from-[var(--hs-cyan)] to-[var(--hs-lime)] bg-clip-text text-transparent">
                     Seek
                   </span>
                 </div>
@@ -244,7 +244,7 @@ export function LandingPage() {
                 Updated every few minutes
               </Pill>
               <Pill>
-                <Gauge className="h-4 w-4 text-[var(--hs-purple)]" />
+                <Gauge className="h-4 w-4 text-[var(--hs-hot)]" />
                 Explainable scoring
               </Pill>
             </motion.div>
@@ -282,7 +282,7 @@ export function LandingPage() {
               </div>
               <div className="hs-card rounded-[18px] p-4">
                 <div className="flex items-center gap-2 text-sm font-semibold text-white/90">
-                  <Grid2X2 className="h-4 w-4 text-[var(--hs-purple)]" />
+                  <Grid2X2 className="h-4 w-4 text-[var(--hs-hot)]" />
                   Multi-source
                 </div>
                 <div className="mt-2 text-xs text-[var(--hs-gray)]">X + Reddit + Google Trends confirmation.</div>
@@ -331,7 +331,7 @@ export function LandingPage() {
               sources: 'X • Trends',
               badge: 'EARLY SIGNAL',
               badgeTone:
-                'bg-[rgba(168,85,247,0.16)] text-[var(--hs-purple)] border-[var(--hs-purple)]/25',
+                'bg-[rgba(255,43,214,0.14)] text-[var(--hs-hot)] border-[var(--hs-hot)]/25',
             },
             {
               title: 'Epstein Files Coin Wave',
@@ -394,7 +394,7 @@ export function LandingPage() {
               body: 'We measure narrative velocity, engagement bursts, and breakout momentum.',
             },
             {
-              icon: <Grid2X2 className="h-5 w-5 text-[var(--hs-purple)]" />,
+              icon: <Grid2X2 className="h-5 w-5 text-[var(--hs-hot)]" />,
               title: '🌍 Cross-Platform Confirmation',
               body: 'Signals are verified across X, Reddit, and Google Trends.',
             },
@@ -459,10 +459,10 @@ export function LandingPage() {
         >
           {[
             { icon: <Radar className="h-5 w-5 text-[var(--hs-cyan)]" />, title: 'Early narrative detection', body: 'Spot cultural moves 1–2 hours before they trend.' },
-            { icon: <TrendingUp className="h-5 w-5 text-[var(--hs-purple)]" />, title: 'Velocity trend charts', body: 'Terminal-grade momentum curves for every narrative.' },
+            { icon: <TrendingUp className="h-5 w-5 text-[var(--hs-hot)]" />, title: 'Velocity trend charts', body: 'Terminal-grade momentum curves for every narrative.' },
             { icon: <Bell className="h-5 w-5 text-[var(--hs-green)]" />, title: 'Watchlists & alerts', body: 'Track narratives, creators, and meme cycles—hands-free.' },
             { icon: <Sparkles className="h-5 w-5 text-[var(--hs-cyan)]" />, title: 'AI breakout reasoning', body: 'Every spike includes a “Why Now” explanation.' },
-            { icon: <Grid2X2 className="h-5 w-5 text-[var(--hs-purple)]" />, title: 'Multi-source validation', body: 'Cross-check X, Reddit, and Google Trends confirmation.' },
+            { icon: <Grid2X2 className="h-5 w-5 text-[var(--hs-hot)]" />, title: 'Multi-source validation', body: 'Cross-check X, Reddit, and Google Trends confirmation.' },
             { icon: <Gauge className="h-5 w-5 text-[var(--hs-green)]" />, title: 'Meme cycle tracking', body: 'Detect repeats, remixes, and second-wave revivals.' },
           ].map((f) => (
             <motion.div key={f.title} variants={item} className="hs-card hs-glow rounded-[18px] p-6">
@@ -489,7 +489,7 @@ export function LandingPage() {
               </p>
               <ul className="mt-5 space-y-2 text-sm text-white/80">
                 <li className="flex items-center gap-2"><span className="h-1.5 w-1.5 rounded-full bg-[var(--hs-cyan)]" />Custom alerts</li>
-                <li className="flex items-center gap-2"><span className="h-1.5 w-1.5 rounded-full bg-[var(--hs-purple)]" />Personal watchlists</li>
+                <li className="flex items-center gap-2"><span className="h-1.5 w-1.5 rounded-full bg-[var(--hs-hot)]" />Personal watchlists</li>
                 <li className="flex items-center gap-2"><span className="h-1.5 w-1.5 rounded-full bg-[var(--hs-green)]" />Anti-bot protection</li>
                 <li className="flex items-center gap-2"><span className="h-1.5 w-1.5 rounded-full bg-white/60" />Future automated execution tools</li>
               </ul>
