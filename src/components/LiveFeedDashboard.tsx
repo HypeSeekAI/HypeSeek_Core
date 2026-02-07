@@ -23,7 +23,7 @@ import { MobileInspectorDrawer } from '@/components/MobileInspector'
 type Narrative = {
   id: string
   title: string
-  score: number
+  score?: number
   velocityPct: number
   window: string
   sources: string[]
@@ -118,28 +118,61 @@ const item: any = {
   show: { opacity: 1, y: 0, transition: { duration: 0.45, ease: 'easeOut' } },
 }
 
-function badgeTone(status: Narrative['status']) {
-  if (status === 'BREAKING') {
-    return 'bg-[rgba(0,246,255,0.14)] text-[var(--hs-cyan)] border-[var(--hs-cyan)]/25'
+function badgeTone(label: string) {
+  if (label === 'BREAKING') {
+    return 'bg-[rgba(0,255,133,0.12)] text-[var(--hs-green)] border-[var(--hs-green)]/25'
   }
-  if (status === 'EARLY SIGNAL') {
-    return 'bg-[rgba(34,211,238,0.12)] text-[var(--hs-cyan)] border-[var(--hs-cyan)]/25'
+  if (label === 'EARLY SIGNAL') {
+    return 'bg-[rgba(0,246,255,0.12)] text-[var(--hs-cyan)] border-[var(--hs-cyan)]/25'
   }
-  return 'bg-[rgba(0,255,133,0.12)] text-[var(--hs-green)] border-[var(--hs-green)]/25'
+  if (label === 'WATCH') {
+    return 'bg-[rgba(255,184,0,0.10)] text-[var(--hs-amber)] border-[var(--hs-amber)]/25'
+  }
+  return 'bg-white/5 text-white/70 border-white/14'
 }
 
-function scoreTone(score: number) {
-  if (score >= 90) return 'text-[var(--hs-cyan)]'
-  if (score >= 85) return 'text-[var(--hs-lime)]'
-  return 'text-white/80'
+function safeScore(score?: number) {
+  if (typeof score !== 'number' || Number.isNaN(score)) return null
+  return Math.round(score)
 }
 
-function PulsingDot({ tone = 'cyan' }: { tone?: 'cyan' | 'purple' | 'green' }) {
+function scoreLabel(score?: number) {
+  const s = safeScore(score)
+  if (s === null) return '—'
+  if (s >= 90) return 'BREAKING'
+  if (s >= 75) return 'EARLY SIGNAL'
+  if (s >= 50) return 'WATCH'
+  return 'QUIET'
+}
+
+function scoreTone(score?: number) {
+  const s = safeScore(score)
+  if (s === null) return 'text-white/55'
+  if (s >= 90) return 'text-[var(--hs-green)]'
+  if (s >= 75) return 'text-[var(--hs-cyan)]'
+  if (s >= 50) return 'text-[var(--hs-amber)]'
+  return 'text-white/70'
+}
+
+function scoreBadgeTone(label: string) {
+  if (label === 'BREAKING') {
+    return 'badgePulse border-[var(--hs-green)]/35 bg-[rgba(0,255,133,0.10)] text-[var(--hs-green)] shadow-[0_0_0_1px_rgba(0,255,133,0.18),0_18px_70px_rgba(0,255,133,0.10)]'
+  }
+  if (label === 'EARLY SIGNAL') {
+    return 'border-[var(--hs-cyan)]/35 bg-[rgba(0,246,255,0.10)] text-[var(--hs-cyan)]'
+  }
+  if (label === 'WATCH') {
+    return 'border-[var(--hs-amber)]/30 bg-[rgba(255,184,0,0.10)] text-[var(--hs-amber)]'
+  }
+  return 'border-white/14 bg-white/5 text-white/70'
+}
+
+function PulsingDot({ tone = 'cyan' }: { tone?: 'cyan' | 'green' | 'amber' }) {
   const c =
-    tone === 'purple'
-      ? 'bg-[var(--hs-lime)]'
-      : tone === 'green'
-        ? 'bg-[var(--hs-green)]'
+    tone === 'green'
+      ? 'bg-[var(--hs-green)]'
+      : tone === 'amber'
+        ? 'bg-[var(--hs-amber)]'
         : 'bg-[var(--hs-cyan)]'
   return (
     <span className="relative inline-flex h-2 w-2">
@@ -304,7 +337,7 @@ function Sidebar({
           <div className="flex items-center justify-between">
             <div className="text-xs text-white/55">Session</div>
             <span className="inline-flex items-center gap-2 text-xs font-semibold text-white/70">
-              <PulsingDot tone={authed ? 'green' : 'purple'} />
+              <PulsingDot tone={authed ? 'green' : 'cyan'} />
               {authed ? 'Signed in' : 'Guest'}
             </span>
           </div>
@@ -417,11 +450,23 @@ function RightPanel({ n }: { n: Narrative | null }) {
           <div className="mt-4">
             <div className="font-display text-lg font-semibold text-white/95">{n.title}</div>
             <div className="mt-2 flex flex-wrap items-center gap-2">
-              <span className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-semibold ${badgeTone(n.status)}`}>
-                <PulsingDot tone={n.status === 'WATCH' ? 'green' : n.status === 'EARLY SIGNAL' ? 'purple' : 'cyan'} />
-                {n.status}
-              </span>
-              <span className={`font-mono text-sm ${scoreTone(n.score)}`}>{n.score}/100</span>
+              {(() => {
+                const s = safeScore(n.score)
+                const label = scoreLabel(n.score)
+                const dotTone = label === 'BREAKING' ? 'green' : label === 'WATCH' ? 'amber' : 'cyan'
+                return (
+                  <>
+                    <span className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-semibold ${badgeTone(label)}`}>
+                      <PulsingDot tone={dotTone} />
+                      {label}
+                    </span>
+                    <span className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-semibold ${scoreBadgeTone(label)}`}>
+                      <span className="h-1.5 w-1.5 rounded-full bg-current opacity-80" />
+                      {s === null ? '—' : `${s}/100`} • {label}
+                    </span>
+                  </>
+                )
+              })()}
               <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-semibold text-white/70">
                 +{n.velocityPct}% / {n.window}
               </span>
@@ -429,7 +474,7 @@ function RightPanel({ n }: { n: Narrative | null }) {
 
             <div className="mt-4 rounded-[18px] border border-white/10 bg-black/30 p-4">
               <div className="text-xs text-white/50">Mini momentum</div>
-              <div className="mt-3 h-16 rounded bg-gradient-to-r from-[rgba(0,246,255,0.18)] via-white/6 to-[rgba(168,85,247,0.18)]" />
+              <div className="mt-3 h-16 rounded bg-gradient-to-r from-[rgba(0,246,255,0.18)] via-white/6 to-[rgba(0,255,133,0.18)]" />
               <div className="mt-2 text-xs text-white/45">(Chart wiring next)</div>
             </div>
 
@@ -476,6 +521,39 @@ function TableHeader({ label }: { label: string }) {
   return <div className="px-3 py-2 text-[11px] font-semibold tracking-[0.18em] text-white/45">{label}</div>
 }
 
+function Sparkline({ points }: { points: number[] }) {
+  const w = 84
+  const h = 22
+  const min = Math.min(...points)
+  const max = Math.max(...points)
+  const span = Math.max(1, max - min)
+  const d = points
+    .map((p, i) => {
+      const x = (i / (points.length - 1)) * w
+      const y = h - ((p - min) / span) * h
+      return `${i === 0 ? 'M' : 'L'}${x.toFixed(2)},${y.toFixed(2)}`
+    })
+    .join(' ')
+
+  return (
+    <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`} className="opacity-90">
+      <path d={d} fill="none" stroke="rgba(0,246,255,0.95)" strokeWidth="1.8" />
+      <path d={d} fill="none" stroke="rgba(0,246,255,0.18)" strokeWidth="6" strokeLinecap="round" />
+    </svg>
+  )
+}
+
+function mockSpark(n: Narrative) {
+  const base = (safeScore(n.score) ?? 50) / 10
+  const vel = n.velocityPct / 50
+  const pts = Array.from({ length: 12 }, (_, i) => {
+    const drift = i * (0.12 + vel * 0.02)
+    const wobble = Math.sin(i * 0.9) * 0.8 + Math.cos(i * 0.35) * 0.6
+    return base + drift + wobble
+  })
+  return pts
+}
+
 function Row({
   n,
   selected,
@@ -485,14 +563,16 @@ function Row({
   selected: boolean
   onSelect: () => void
 }) {
-  const hot = n.score >= 90
+  const s = safeScore(n.score)
+  const label = scoreLabel(n.score)
+  const hot = label === 'BREAKING'
   const vel = n.velocityPct
   const velTone = vel >= 250 ? 'text-[var(--hs-cyan)]' : vel >= 180 ? 'text-[var(--hs-amber)]' : 'text-white/80'
 
   return (
     <motion.button
       onClick={onSelect}
-      className={`group grid w-full min-w-0 grid-cols-[minmax(0,1.6fr)_minmax(0,0.7fr)_minmax(0,0.9fr)_minmax(0,0.9fr)_minmax(0,0.7fr)_minmax(0,0.9fr)] items-center border-t border-white/6 px-3 py-3 text-left transition hover:bg-white/4 ${
+      className={`group grid w-full min-w-0 grid-cols-[minmax(0,1.6fr)_minmax(0,0.85fr)_minmax(0,0.8fr)_minmax(0,0.9fr)_minmax(0,0.9fr)_minmax(0,0.7fr)_minmax(0,0.9fr)] items-center border-t border-white/6 px-3 py-3 text-left transition hover:bg-white/4 ${
         selected ? 'bg-[rgba(0,246,255,0.06)]' : ''
       }`}
       whileHover={{ x: 2 }}
@@ -517,18 +597,31 @@ function Row({
         </div>
       </div>
 
-      <div className={`font-mono text-sm font-semibold ${scoreTone(n.score)}`}>{n.score}</div>
+      <div className="flex min-w-0 flex-col">
+        <div className={`font-mono text-sm font-semibold ${scoreTone(n.score)}`}>{s === null ? '—' : `${s}/100`}</div>
+        <div className="text-[11px] font-semibold text-white/45">{label}</div>
+      </div>
 
       <div className={`font-mono text-sm font-semibold ${velTone}`}>+{n.velocityPct}%</div>
 
-      <div className="text-xs text-white/60 truncate">{n.sources.join(' • ')}</div>
+      <div className="flex items-center">
+        <Sparkline points={mockSpark(n)} />
+      </div>
+
+      <div className="min-w-0">
+        <div className="text-xs text-white/60 truncate">{n.sources.join(' • ')}</div>
+        <div className="mt-1 text-[11px] text-white/45">Why this is moving →</div>
+        <div className="mt-0.5 line-clamp-2 text-[11px] text-white/55 italic opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+          Engagement burst in the last 18 minutes + confirmed Reddit spike.
+        </div>
+      </div>
 
       <div className="font-mono text-xs text-white/55">{n.updatedAgo}</div>
 
       <div className="flex items-center justify-between gap-2">
-        <span className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-semibold ${badgeTone(n.status)}`}>
+        <span className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-semibold ${badgeTone(label)}`}>
           <span className="h-1.5 w-1.5 rounded-full bg-current opacity-80" />
-          {n.status}
+          {label}
         </span>
         <ChevronRight className="h-4 w-4 text-white/35 transition group-hover:translate-x-0.5" />
       </div>
@@ -542,7 +635,9 @@ export function LiveFeedDashboard() {
   const [authed, setAuthed] = useState(false)
   const [query, setQuery] = useState('')
   const [chain, setChain] = useState<'ALL' | 'SOL' | 'ETH' | 'BASE'>('ALL')
-  const [status, setStatus] = useState<'ALL' | Narrative['status']>('ALL')
+  const [platform, setPlatform] = useState<'ALL' | 'X' | 'Reddit' | 'Trends'>('ALL')
+  const [status, setStatus] = useState<'ALL' | 'BREAKING' | 'EARLY SIGNAL' | 'WATCH'>('ALL')
+  const [sortVel, setSortVel] = useState<'DESC' | 'ASC'>('DESC')
   const [selectedId, setSelectedId] = useState<string | null>('n1')
   const [mobileInspectorOpen, setMobileInspectorOpen] = useState(false)
 
@@ -555,7 +650,14 @@ export function LiveFeedDashboard() {
     const q = query.trim().toLowerCase()
     return seed
       .filter((n) => (chain === 'ALL' ? true : (n.chain ?? '—') === chain))
-      .filter((n) => (status === 'ALL' ? true : n.status === status))
+      .filter((n) => {
+        if (platform === 'ALL') return true
+        return n.sources.includes(platform)
+      })
+      .filter((n) => {
+        if (status === 'ALL') return true
+        return scoreLabel(n.score) === status
+      })
       .filter((n) => {
         if (!q) return true
         return (
@@ -564,8 +666,11 @@ export function LiveFeedDashboard() {
           n.sources.some((s) => s.toLowerCase().includes(q))
         )
       })
-      .sort((a, b) => b.score - a.score)
-  }, [query, status, chain])
+      .sort((a, b) => {
+        if (sortVel === 'ASC') return a.velocityPct - b.velocityPct
+        return b.velocityPct - a.velocityPct
+      })
+  }, [query, status, chain, platform, sortVel])
 
   const selected = useMemo(() => seed.find((n) => n.id === selectedId) ?? null, [selectedId])
 
@@ -799,11 +904,73 @@ export function LiveFeedDashboard() {
                       </div>
                     </div>
 
-                    <div className="grid min-w-0 grid-cols-[minmax(0,1.6fr)_minmax(0,0.7fr)_minmax(0,0.9fr)_minmax(0,0.9fr)_minmax(0,0.7fr)_minmax(0,0.9fr)] border-t border-white/8">
+                    {/* 5) Filter + sort bar (Dex-style) */}
+                    <div className="sticky top-[56px] z-30 border-t border-white/8 bg-black/55 px-3 py-3 backdrop-blur-xl">
+                      <div className="flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-2 text-xs font-semibold text-white/75">
+                            Platform
+                            <ChevronDown className="h-4 w-4 text-white/50" />
+                          </div>
+                          {(['ALL', 'X', 'Reddit', 'Trends'] as const).map((p) => (
+                            <button
+                              key={p}
+                              onClick={() => setPlatform(p)}
+                              className={`rounded-full border px-4 py-2 text-xs font-semibold transition ${
+                                platform === p
+                                  ? 'border-[var(--hs-cyan)]/30 bg-[rgba(0,246,255,0.10)] text-white'
+                                  : 'border-white/10 bg-white/5 text-white/70 hover:bg-white/7'
+                              }`}
+                            >
+                              {p}
+                            </button>
+                          ))}
+
+                          <div className="ml-0 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-2 text-xs font-semibold text-white/75 lg:ml-2">
+                            Status
+                            <ChevronDown className="h-4 w-4 text-white/50" />
+                          </div>
+                          {(['ALL', 'BREAKING', 'EARLY SIGNAL', 'WATCH'] as const).map((s) => (
+                            <button
+                              key={s}
+                              onClick={() => setStatus(s)}
+                              className={`rounded-full border px-4 py-2 text-xs font-semibold transition ${
+                                status === s
+                                  ? 'border-[var(--hs-cyan)]/30 bg-[rgba(0,246,255,0.10)] text-white'
+                                  : 'border-white/10 bg-white/5 text-white/70 hover:bg-white/7'
+                              }`}
+                            >
+                              {s}
+                            </button>
+                          ))}
+
+                          <button
+                            onClick={() => setSortVel((v) => (v === 'DESC' ? 'ASC' : 'DESC'))}
+                            className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-semibold text-white/80 hover:bg-white/7"
+                            title="Sort by velocity"
+                          >
+                            Velocity {sortVel === 'DESC' ? '↓' : '↑'}
+                          </button>
+                        </div>
+
+                        <div className="relative">
+                          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-white/40" />
+                          <input
+                            value={query}
+                            onChange={(e) => setQuery(e.target.value)}
+                            placeholder="Search narratives"
+                            className="w-full rounded-full border border-white/10 bg-white/5 py-2 pl-9 pr-3 text-sm text-white/85 placeholder:text-white/35 outline-none transition focus:border-[var(--hs-cyan)]/35 focus:shadow-[0_0_0_3px_rgba(0,246,255,0.10)] lg:w-[320px]"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="grid min-w-0 grid-cols-[minmax(0,1.6fr)_minmax(0,0.85fr)_minmax(0,0.8fr)_minmax(0,0.9fr)_minmax(0,0.9fr)_minmax(0,0.7fr)_minmax(0,0.9fr)] border-t border-white/8">
                       <TableHeader label="NARRATIVE" />
                       <TableHeader label="SCORE" />
                       <TableHeader label="VELOCITY" />
-                      <TableHeader label="SOURCES" />
+                      <TableHeader label="TREND" />
+                      <TableHeader label="SOURCES / WHY" />
                       <TableHeader label="UPDATED" />
                       <TableHeader label="STATUS" />
                     </div>
