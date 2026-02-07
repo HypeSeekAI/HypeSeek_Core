@@ -214,6 +214,38 @@ export default function App() {
             animate="show"
             className="relative z-10 w-full"
           >
+            {/* Integrated banner strip (DexScreener-grade trust) */}
+            <motion.div
+              variants={item}
+              className="mb-7 inline-flex w-full items-center gap-4 rounded-[18px] border border-white/10 bg-gradient-to-r from-black/70 via-white/4 to-black/40 px-4 py-3 backdrop-blur-xl md:w-auto md:px-5"
+            >
+              <div className="relative">
+                <div className="absolute -inset-2 rounded-2xl bg-[rgba(0,246,255,0.12)] blur" />
+                <div className="relative flex h-12 w-12 items-center justify-center rounded-2xl border border-white/12 bg-black/60">
+                  <img
+                    src="/brand/hypeseek-icon.jpg"
+                    alt="HypeSeek"
+                    className="h-8 w-8 rounded-xl object-cover"
+                    loading="eager"
+                  />
+                </div>
+              </div>
+
+              <div className="flex flex-col">
+                <div className="font-display text-2xl font-semibold tracking-tight text-white md:text-[28px]">
+                  <span className="bg-gradient-to-r from-white via-white to-[var(--hs-cyan)] bg-clip-text text-transparent">
+                    Hype
+                  </span>
+                  <span className="bg-gradient-to-r from-[var(--hs-cyan)] to-[var(--hs-purple)] bg-clip-text text-transparent">
+                    Seek
+                  </span>
+                </div>
+                <div className="mt-0.5 text-[11px] font-semibold tracking-[0.28em] text-white/55 md:text-xs">
+                  STOP TRADING CANDLES. START TRADING CULTURE.
+                </div>
+              </div>
+            </motion.div>
+
             <motion.div variants={item} className="mb-6 flex flex-wrap items-center gap-2">
               <Pill>
                 <Radar className="h-4 w-4 text-[var(--hs-cyan)]" />
