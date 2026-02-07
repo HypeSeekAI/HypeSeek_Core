@@ -153,14 +153,22 @@ export default function App() {
       {/* SECTION 1 — TOP NAVIGATION BAR */}
       <header className="sticky top-0 z-50 border-b border-white/10 bg-black/40 backdrop-blur-xl">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 md:px-6">
-          <a href="#" className="flex items-center gap-2">
-            <span className="relative inline-flex h-7 w-7 items-center justify-center">
-              <span className="absolute inset-0 rounded-full bg-[rgba(0,246,255,0.12)] blur" />
-              <span className="pulse" aria-hidden />
+          <a href="#" className="flex items-center gap-3">
+            <span className="relative inline-flex h-8 w-8 items-center justify-center">
+              <span className="absolute inset-0 rounded-full bg-[rgba(0,246,255,0.10)] blur" />
+              <img
+                src="/brand/hypeseek-icon.jpg"
+                alt="HypeSeek"
+                className="relative h-8 w-8 rounded-full object-cover"
+                loading="eager"
+              />
             </span>
-            <span className="font-display text-lg font-semibold tracking-tight text-white">
-              HypeSeek
-            </span>
+            <img
+              src="/brand/hypeseek-wordmark.jpg"
+              alt="HypeSeek"
+              className="h-6 w-auto opacity-90"
+              loading="eager"
+            />
           </a>
 
           <nav className="hidden items-center gap-6 text-sm text-white/70 md:flex">
@@ -569,7 +577,7 @@ export default function App() {
         <div className="mx-auto flex max-w-6xl flex-col gap-4 px-4 py-10 md:flex-row md:items-center md:justify-between md:px-6">
           <div className="text-sm text-white/70">HypeSeek © 2026</div>
           <div className="flex items-center gap-5 text-sm text-white/60">
-            <a id="docs" href="#docs" className="inline-flex items-center gap-2 hover:text-white">
+            <a href="#docs" className="inline-flex items-center gap-2 hover:text-white">
               <BookOpen className="h-4 w-4" /> Docs
             </a>
             <a
