@@ -15,7 +15,7 @@ import {
 } from 'lucide-react'
 
 const navItems = [
-  { label: 'Live Feed', href: '#live-feed' },
+  { label: 'Live Feed', href: '/live-feed' },
   { label: 'How It Works', href: '#how-it-works' },
   { label: 'Alerts', href: '#alerts' },
   { label: 'Docs', href: '#docs' },
@@ -260,7 +260,7 @@ export function LandingPage() {
             </motion.p>
 
             <motion.div variants={item} className="mt-8 flex flex-wrap items-center gap-3">
-              <GlowButton variant="primary" href="#live-feed">
+              <GlowButton variant="primary" href="/live-feed">
                 ✅ View Live Feed (No Wallet Needed)
               </GlowButton>
               <GlowButton variant="secondary" href="#alerts">
@@ -512,7 +512,7 @@ export function LandingPage() {
               Culture moves before charts. Don’t trade late.
             </h3>
             <div className="mt-6 flex flex-wrap items-center gap-3">
-              <GlowButton variant="primary" href="#live-feed">✅ View Live Feed</GlowButton>
+              <GlowButton variant="primary" href="/live-feed">✅ View Live Feed</GlowButton>
               <GlowButton variant="secondary" href="#alerts">⭐️ Unlock Alerts</GlowButton>
             </div>
           </div>
