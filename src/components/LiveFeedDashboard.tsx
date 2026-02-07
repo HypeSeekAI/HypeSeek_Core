@@ -17,6 +17,8 @@ import {
   TrendingUp,
 } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
+import { MobileBottomNav } from '@/components/MobileNav'
+import { MobileInspectorDrawer } from '@/components/MobileInspector'
 
 type Narrative = {
   id: string
@@ -250,7 +252,7 @@ function Sidebar({
   ] as const
 
   return (
-    <aside className="sticky top-0 h-screen w-[280px] shrink-0 border-r border-white/10 bg-black/45 backdrop-blur-xl">
+    <aside className="sticky top-0 hidden h-screen w-[260px] shrink-0 border-r border-white/10 bg-black/45 backdrop-blur-xl lg:block">
       <div className="flex items-center gap-3 px-5 py-5">
         <span className="relative inline-flex h-10 w-10 items-center justify-center">
           <span className="absolute inset-0 rounded-2xl bg-[rgba(0,246,255,0.10)] blur" />
@@ -542,6 +544,7 @@ export function LiveFeedDashboard() {
   const [chain, setChain] = useState<'ALL' | 'SOL' | 'ETH' | 'BASE'>('ALL')
   const [status, setStatus] = useState<'ALL' | Narrative['status']>('ALL')
   const [selectedId, setSelectedId] = useState<string | null>('n1')
+  const [mobileInspectorOpen, setMobileInspectorOpen] = useState(false)
 
   useEffect(() => {
     const t = setTimeout(() => setReady(true), 850)
@@ -574,7 +577,7 @@ export function LiveFeedDashboard() {
   const rotateY = useTransform(bx, [-40, 40], [-6, 6])
 
   return (
-    <div className="relative z-10 min-h-screen">
+    <div className="relative z-10 min-h-screen pb-20 lg:pb-0">
       <Preloader done={ready} />
 
       <AuthModal
@@ -594,7 +597,7 @@ export function LiveFeedDashboard() {
         <div className="min-h-screen w-full">
           {/* Top bar */}
           <div className="sticky top-0 z-40 border-b border-white/10 bg-black/55 backdrop-blur-xl">
-            <div className="mx-auto flex max-w-[1480px] items-center justify-between gap-4 px-4 py-3">
+            <div className="mx-auto flex w-full max-w-[1680px] items-center justify-between gap-4 px-4 py-3 md:px-6 2xl:px-8">
               <div className="flex items-center gap-3">
                 <div className="hidden items-center gap-2 md:flex">
                   <PulsingDot tone="cyan" />
@@ -627,7 +630,7 @@ export function LiveFeedDashboard() {
             <Marquee text="TRADE CULTURE BEFORE CHARTS" />
           </div>
 
-          <main className="mx-auto max-w-[1480px] px-4 py-8">
+          <main className="mx-auto w-full max-w-[1680px] px-4 py-6 md:px-6 2xl:px-8">
             {/* Dex-like header strip */}
             <motion.div
               variants={container}
@@ -812,7 +815,10 @@ export function LiveFeedDashboard() {
                         key={n.id}
                         n={n}
                         selected={selectedId === n.id}
-                        onSelect={() => setSelectedId(n.id)}
+                        onSelect={() => {
+                          setSelectedId(n.id)
+                          setMobileInspectorOpen(true)
+                        }}
                       />
                     ))}
 
@@ -822,7 +828,7 @@ export function LiveFeedDashboard() {
                   </motion.div>
                 </div>
 
-                <div className="lg:sticky lg:top-24 lg:self-start">
+                <div className="hidden lg:block lg:sticky lg:top-24 lg:self-start">
                   <RightPanel n={selected} />
                 </div>
               </motion.div>
@@ -830,6 +836,21 @@ export function LiveFeedDashboard() {
           </main>
         </div>
       </div>
+
+      {/* Mobile inspector drawer */}
+      <MobileInspectorDrawer
+        open={mobileInspectorOpen}
+        onClose={() => setMobileInspectorOpen(false)}
+        title={selected ? selected.title : 'Narrative'}
+      >
+        {/* reuse the right panel content on mobile */}
+        <div className="hs-card rounded-[18px] p-4">
+          <RightPanel n={selected} />
+        </div>
+      </MobileInspectorDrawer>
+
+      {/* Mobile bottom nav */}
+      <MobileBottomNav active={activeTab} setActive={(v) => setActiveTab(v as any)} />
 
       {/* keyframes for marquee */}
       <style jsx global>{`
