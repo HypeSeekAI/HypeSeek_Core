@@ -1,23 +1,28 @@
 # HypeSeek_Core
 
-Core repository for the HypeSeek project.
+HypeSeek — Trade culture before charts.
 
-## Landing page
+This repository currently contains the **Next.js** marketing site / landing page for HypeSeek (App Router + Tailwind + Framer Motion).
 
-The landing page lives in `landing/`.
-
-### Run locally
+## Local development
 
 ```bash
-cd landing
 npm install
 npm run dev
 ```
 
-### Build
+## Production build
 
 ```bash
-cd landing
 npm run build
-npm run preview
+npm start
 ```
+
+## Env
+
+Copy `.env.example` → `.env.local` and fill in values as needed.
+
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+
+(Do **not** expose `SUPABASE_SERVICE_ROLE_KEY` to the browser.)
