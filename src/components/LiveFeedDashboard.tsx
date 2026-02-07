@@ -492,7 +492,7 @@ function Row({
   return (
     <motion.button
       onClick={onSelect}
-      className={`group grid w-full grid-cols-[1.6fr_0.7fr_0.9fr_0.9fr_0.7fr_0.9fr] items-center border-t border-white/6 px-3 py-3 text-left transition hover:bg-white/4 ${
+      className={`group grid w-full min-w-0 grid-cols-[minmax(0,1.6fr)_minmax(0,0.7fr)_minmax(0,0.9fr)_minmax(0,0.9fr)_minmax(0,0.7fr)_minmax(0,0.9fr)] items-center border-t border-white/6 px-3 py-3 text-left transition hover:bg-white/4 ${
         selected ? 'bg-[rgba(0,246,255,0.06)]' : ''
       }`}
       whileHover={{ x: 2 }}
@@ -502,8 +502,8 @@ function Row({
         <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-white/10 bg-black/30">
           <Flame className={`h-4 w-4 ${hot ? 'text-[var(--hs-cyan)]' : 'text-white/55'}`} />
         </span>
-        <div>
-          <div className="font-display text-sm font-semibold text-white/90">
+        <div className="min-w-0">
+          <div className="font-display text-sm font-semibold text-white/90 truncate">
             {n.title}
           </div>
           <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-white/50">
@@ -521,7 +521,7 @@ function Row({
 
       <div className={`font-mono text-sm font-semibold ${velTone}`}>+{n.velocityPct}%</div>
 
-      <div className="text-xs text-white/60">{n.sources.join(' • ')}</div>
+      <div className="text-xs text-white/60 truncate">{n.sources.join(' • ')}</div>
 
       <div className="font-mono text-xs text-white/55">{n.updatedAgo}</div>
 
@@ -586,7 +586,7 @@ export function LiveFeedDashboard() {
         onAuthed={() => setAuthed(true)}
       />
 
-      <div className="flex">
+      <div className="flex min-w-0 overflow-x-hidden">
         <Sidebar
           active={activeTab}
           setActive={(v) => setActiveTab(v as any)}
@@ -594,10 +594,10 @@ export function LiveFeedDashboard() {
           signOut={() => setAuthed(false)}
         />
 
-        <div className="min-h-screen w-full">
+        <div className="min-h-screen w-full min-w-0 overflow-x-hidden">
           {/* Top bar */}
           <div className="sticky top-0 z-40 border-b border-white/10 bg-black/55 backdrop-blur-xl">
-            <div className="mx-auto flex w-full max-w-[1680px] items-center justify-between gap-4 px-4 py-3 md:px-6 2xl:px-8">
+            <div className="mx-auto flex w-full max-w-full items-center justify-between gap-4 px-4 py-3 md:px-6 2xl:px-8">
               <div className="flex items-center gap-3">
                 <div className="hidden items-center gap-2 md:flex">
                   <PulsingDot tone="cyan" />
@@ -630,7 +630,7 @@ export function LiveFeedDashboard() {
             <Marquee text="TRADE CULTURE BEFORE CHARTS" />
           </div>
 
-          <main className="mx-auto w-full max-w-[1680px] px-4 py-6 md:px-6 2xl:px-8">
+          <main className="mx-auto w-full max-w-full px-4 py-6 md:px-6 2xl:px-8">
             {/* Dex-like header strip */}
             <motion.div
               variants={container}
@@ -779,7 +779,7 @@ export function LiveFeedDashboard() {
               </motion.div>
 
               {/* Main Dex-like grid: table + right panel */}
-              <motion.div variants={item} className="grid grid-cols-1 gap-6 lg:grid-cols-[1.8fr_1fr]">
+              <motion.div variants={item} className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1.8fr)_minmax(0,1fr)]">
                 <div className="hs-card overflow-hidden rounded-[18px]">
                   <div className="border-b border-white/8 bg-black/35">
                     <div className="flex items-center justify-between px-3 py-3">
@@ -799,7 +799,7 @@ export function LiveFeedDashboard() {
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-[1.6fr_0.7fr_0.9fr_0.9fr_0.7fr_0.9fr] border-t border-white/8">
+                    <div className="grid min-w-0 grid-cols-[minmax(0,1.6fr)_minmax(0,0.7fr)_minmax(0,0.9fr)_minmax(0,0.9fr)_minmax(0,0.7fr)_minmax(0,0.9fr)] border-t border-white/8">
                       <TableHeader label="NARRATIVE" />
                       <TableHeader label="SCORE" />
                       <TableHeader label="VELOCITY" />
