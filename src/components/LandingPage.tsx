@@ -1,542 +1,323 @@
 'use client'
 
+import Link from 'next/link'
 import { motion } from 'framer-motion'
 import {
-  Activity,
+  ArrowRight,
   Bell,
   BookOpen,
   ChevronRight,
-  Gauge,
   Grid2X2,
   Radar,
+  Search,
+  ShieldCheck,
   Sparkles,
-  Timer,
   TrendingUp,
 } from 'lucide-react'
+import { rise, staggerIn } from '@/lib/motion'
 
-const navItems = [
-  { label: 'Live Feed', href: '/live-feed' },
-  { label: 'How It Works', href: '#how-it-works' },
-  { label: 'Alerts', href: '#alerts' },
-  { label: 'Docs', href: '#docs' },
-]
-
-// Framer Motion variants (typed loosely to avoid version-specific easing typings)
-const container: any = {
-  hidden: { opacity: 0 },
-  show: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.08,
-      delayChildren: 0.08,
-    },
-  },
-}
-
-const item: any = {
-  hidden: { opacity: 0, y: 14 },
-  show: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.55, ease: 'easeOut' },
-  },
-}
-
-function Pill({ children }: { children: React.ReactNode }) {
+function Chip({ children }: { children: React.ReactNode }) {
   return (
-    <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium text-white/80">
+    <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-semibold text-white/75">
       {children}
     </span>
   )
 }
 
-function GlowButton({
-  variant,
+function ButtonPrimary({
   children,
   href,
 }: {
-  variant: 'primary' | 'secondary' | 'outline'
   children: React.ReactNode
   href: string
 }) {
-  const base =
-    'inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-semibold transition will-change-transform focus:outline-none focus:ring-2 focus:ring-[var(--hs-cyan)]/40'
-
-  if (variant === 'primary') {
-    return (
-      <a
-        href={href}
-        className={`${base} bg-[var(--hs-cyan)] text-black shadow-[0_0_0_1px_rgba(0,246,255,0.28),0_18px_60px_rgba(0,246,255,0.12)] hover:shadow-[0_0_0_1px_rgba(0,246,255,0.40),0_22px_70px_rgba(0,246,255,0.16)] hover:-translate-y-0.5`}
-      >
-        {children}
-        <ChevronRight className="h-4 w-4" />
-      </a>
-    )
-  }
-
-  if (variant === 'secondary') {
-    return (
-      <a
-        href={href}
-        className={`${base} bg-white/7 text-white shadow-[0_0_0_1px_rgba(255,255,255,0.10)] hover:bg-white/10 hover:-translate-y-0.5`}
-      >
-        {children}
-      </a>
-    )
-  }
-
   return (
-    <a
+    <Link
       href={href}
-      className={`${base} border border-white/14 bg-transparent text-white/90 hover:border-white/22 hover:bg-white/5`}
+      className="inline-flex items-center justify-center gap-2 rounded-full bg-[var(--hs-cyan)] px-5 py-3 text-sm font-semibold text-black shadow-[0_0_0_1px_rgba(0,246,255,0.28),0_18px_60px_rgba(0,246,255,0.10)] transition hover:-translate-y-0.5 hover:shadow-[0_0_0_1px_rgba(0,246,255,0.36),0_22px_70px_rgba(0,246,255,0.14)]"
     >
       {children}
-    </a>
+      <ArrowRight className="h-4 w-4" />
+    </Link>
   )
 }
 
-function Metric({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="flex items-baseline justify-between gap-3">
-      <div className="text-xs text-[var(--hs-gray)]">{label}</div>
-      <div className="font-mono text-sm tracking-tight text-white/90">{value}</div>
-    </div>
-  )
-}
-
-function ScoreBadge({ score }: { score: number }) {
-  const hot = score >= 90
-  return (
-    <span
-      className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-semibold ${
-        hot
-          ? 'badgePulse border-[var(--hs-cyan)]/35 bg-[rgba(0,246,255,0.10)] text-[var(--hs-cyan)]'
-          : 'border-white/14 bg-white/5 text-white/80'
-      }`}
-    >
-      <span className="h-1.5 w-1.5 rounded-full bg-current opacity-80" />
-      Hype Score: {score}/100
-    </span>
-  )
-}
-
-function SectionHeading({
-  kicker,
-  title,
-  subtitle,
+function ButtonGhost({
+  children,
+  href,
 }: {
-  kicker?: string
-  title: string
-  subtitle?: string
+  children: React.ReactNode
+  href: string
 }) {
   return (
-    <div className="mx-auto max-w-3xl text-center">
-      {kicker ? (
-        <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium text-white/70">
-          <Sparkles className="h-4 w-4 text-[var(--hs-lime)]" />
-          {kicker}
+    <Link
+      href={href}
+      className="inline-flex items-center justify-center gap-2 rounded-full border border-white/14 bg-white/5 px-5 py-3 text-sm font-semibold text-white/85 transition hover:bg-white/8"
+    >
+      {children}
+    </Link>
+  )
+}
+
+function Surface({ children }: { children: React.ReactNode }) {
+  return <div className="hs-card rounded-[18px]">{children}</div>
+}
+
+function TerminalMock() {
+  return (
+    <Surface>
+      <div className="relative overflow-hidden rounded-[18px]">
+        <div className="absolute inset-0 opacity-70">
+          <div className="radar" />
         </div>
-      ) : null}
-      <h2 className="font-display text-3xl font-semibold tracking-tight text-white md:text-4xl">
-        {title}
-      </h2>
-      {subtitle ? (
-        <p className="mt-3 text-sm leading-relaxed text-[var(--hs-gray)] md:text-base">
-          {subtitle}
-        </p>
-      ) : null}
-    </div>
+
+        {/* slow scan */}
+        <motion.div
+          className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-[rgba(0,255,133,0.10)] to-transparent"
+          initial={{ y: -120, opacity: 0.0 }}
+          animate={{ y: 420, opacity: 1 }}
+          transition={{ duration: 10, repeat: Infinity, ease: 'linear' }}
+        />
+
+        <div className="relative z-10 p-5">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2 text-sm font-semibold text-white/85">
+              <Radar className="h-4 w-4 text-[var(--hs-cyan)]" />
+              Live Narratives
+            </div>
+            <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-black/45 px-3 py-1 text-xs font-semibold text-white/70">
+              <span className="relative inline-flex h-2 w-2">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[var(--hs-green)] opacity-40" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-[var(--hs-green)]" />
+              </span>
+              updated 0.3s ago
+            </span>
+          </div>
+
+          <div className="mt-4 rounded-[18px] border border-white/10 bg-black/35 p-4">
+            <div className="grid grid-cols-[1.4fr_0.6fr_0.7fr_0.7fr] gap-3 border-b border-white/8 pb-3 text-[11px] font-semibold tracking-[0.2em] text-white/45">
+              <div>NARRATIVE</div>
+              <div>SCORE</div>
+              <div>VELOCITY</div>
+              <div>SOURCES</div>
+            </div>
+            <div className="divide-y divide-white/6">
+              {[
+                { t: 'AI Agents + Solana Meta', s: '92', v: '+340%', src: 'X • Reddit • Trends' },
+                { t: 'Trump Meme Resurgence', s: '88', v: '+210%', src: 'X • Trends' },
+                { t: 'Epstein Files Coin Wave', s: '81', v: '+160%', src: 'X • Reddit' },
+              ].map((r) => (
+                <div
+                  key={r.t}
+                  className="grid grid-cols-[1.4fr_0.6fr_0.7fr_0.7fr] gap-3 py-3 text-sm"
+                >
+                  <div className="truncate font-semibold text-white/85">{r.t}</div>
+                  <div className="font-mono font-semibold text-[var(--hs-cyan)]">{r.s}</div>
+                  <div className="font-mono font-semibold text-[var(--hs-green)]">{r.v}</div>
+                  <div className="truncate text-xs text-white/55">{r.src}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* tape */}
+          <div className="mt-4 flex items-center gap-2 overflow-hidden rounded-full border border-white/10 bg-black/40 px-4 py-2 text-xs text-white/60">
+            <span className="font-mono text-[var(--hs-green)]">BUY</span>
+            <span className="font-mono">AIAGENT</span>
+            <span className="text-white/35">•</span>
+            <span className="font-mono">+12.4%</span>
+            <span className="text-white/35">•</span>
+            <span className="font-mono">0.8s</span>
+            <span className="mx-2 h-3 w-px bg-white/10" />
+            <span className="font-mono text-[var(--hs-red)]">SELL</span>
+            <span className="font-mono">TREND</span>
+            <span className="text-white/35">•</span>
+            <span className="font-mono">-3.1%</span>
+            <span className="text-white/35">•</span>
+            <span className="font-mono">1.2s</span>
+          </div>
+        </div>
+      </div>
+    </Surface>
   )
 }
 
 export function LandingPage() {
   return (
-    <div className="noise relative z-10 min-h-screen">
-      {/* SECTION 1 — TOP NAVIGATION BAR */}
+    <div className="noise relative z-10">
+      {/* Top nav */}
       <header className="sticky top-0 z-50 border-b border-white/10 bg-black/40 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 md:px-6">
-          <a href="#" className="flex items-center gap-3">
-            <span className="relative inline-flex h-8 w-8 items-center justify-center">
-              <span className="absolute inset-0 rounded-full bg-[rgba(0,246,255,0.10)] blur" />
+        <div className="mx-auto flex w-full max-w-[1480px] items-center justify-between px-4 py-3 md:px-6 2xl:px-8">
+          <Link href="/" className="flex items-center gap-3">
+            <span className="relative inline-flex h-9 w-9 items-center justify-center">
+              <span className="absolute inset-0 rounded-2xl bg-[rgba(0,246,255,0.10)] blur" />
               <img
                 src="/brand/hypeseek-icon.jpg"
                 alt="HypeSeek"
-                className="relative h-8 w-8 rounded-full object-cover"
+                className="relative h-9 w-9 rounded-2xl border border-white/10 object-cover"
               />
             </span>
-            <span className="font-display text-lg font-semibold tracking-tight text-white">
-              HypeSeek
-            </span>
-          </a>
+            <span className="font-display text-lg font-semibold text-white">HypeSeek</span>
+          </Link>
 
-          <nav className="hidden items-center gap-6 text-sm text-white/70 md:flex">
-            {navItems.map((it) => (
-              <a key={it.href} href={it.href} className="transition hover:text-white">
-                {it.label}
-              </a>
-            ))}
+          <nav className="hidden items-center gap-6 text-sm font-semibold text-white/70 md:flex">
+            <Link href="/live-feed" className="hover:text-white">
+              Live Feed
+            </Link>
+            <Link href="#how" className="hover:text-white">
+              How It Works
+            </Link>
+            <Link href="/alerts" className="hover:text-white">
+              Alerts
+            </Link>
+            <Link href="/docs" className="hover:text-white">
+              Docs
+            </Link>
           </nav>
 
-          <div className="flex items-center gap-3">
-            <a
-              href="#sign-in"
-              className="hidden rounded-full border border-white/14 bg-transparent px-4 py-2 text-sm font-semibold text-white/90 transition hover:border-white/22 hover:bg-white/5 md:inline-flex"
+          <div className="flex items-center gap-2">
+            <Link
+              href="/auth"
+              className="rounded-full border border-white/14 bg-white/5 px-4 py-2 text-sm font-semibold text-white/85 hover:bg-white/8"
             >
               Sign In
-            </a>
-            <a
-              href="#sign-in"
-              className="inline-flex rounded-full border border-white/14 bg-white/5 px-4 py-2 text-sm font-semibold text-white/90 transition hover:bg-white/8 md:hidden"
-            >
-              Sign In
-            </a>
+            </Link>
           </div>
         </div>
       </header>
 
-      {/* SECTION 2 — HERO (Above the Fold) */}
+      {/* Hero */}
       <section className="relative overflow-hidden">
         <div className="absolute inset-0">
           <div className="radar" />
-          <div className="pulse" style={{ left: '65%', top: '45%' }} />
         </div>
 
-        <div className="mx-auto flex min-h-[92vh] max-w-6xl items-center px-4 py-16 md:px-6">
-          <motion.div variants={container} initial="hidden" animate="show" className="relative z-10 w-full">
-            {/* Integrated banner strip */}
-            <motion.div
-              variants={item}
-              className="mb-7 inline-flex w-full items-center gap-4 rounded-[18px] border border-white/10 bg-gradient-to-r from-black/70 via-white/4 to-black/40 px-4 py-3 backdrop-blur-xl md:w-auto md:px-5"
-            >
-              <div className="relative">
-                <div className="absolute -inset-2 rounded-2xl bg-[rgba(0,246,255,0.12)] blur" />
-                <div className="relative flex h-12 w-12 items-center justify-center rounded-2xl border border-white/12 bg-black/60">
-                  <img
-                    src="/brand/hypeseek-icon.jpg"
-                    alt="HypeSeek"
-                    className="h-8 w-8 rounded-xl object-cover"
-                  />
-                </div>
-              </div>
+        <div className="mx-auto w-full max-w-[1480px] px-4 py-14 md:px-6 2xl:px-8">
+          <motion.div variants={staggerIn} initial="hidden" animate="show" className="grid gap-10 lg:grid-cols-[1.05fr_1fr]">
+            <div className="relative z-10">
+              <motion.div variants={rise} className="flex flex-wrap items-center gap-2">
+                <Chip>
+                  <Sparkles className="h-4 w-4 text-[var(--hs-lime)]" />
+                  Virality intelligence terminal
+                </Chip>
+                <Chip>
+                  <ShieldCheck className="h-4 w-4 text-[var(--hs-cyan)]" />
+                  Explainable score
+                </Chip>
+                <Chip>
+                  <TrendingUp className="h-4 w-4 text-[var(--hs-green)]" />
+                  Updated every few minutes
+                </Chip>
+              </motion.div>
 
-              <div className="flex flex-col">
-                <div className="font-display text-2xl font-semibold tracking-tight text-white md:text-[28px]">
-                  <span className="bg-gradient-to-r from-white via-white to-[var(--hs-cyan)] bg-clip-text text-transparent">
-                    Hype
-                  </span>
-                  <span className="bg-gradient-to-r from-[var(--hs-cyan)] to-[var(--hs-lime)] bg-clip-text text-transparent">
-                    Seek
-                  </span>
-                </div>
-                <div className="mt-0.5 text-[11px] font-semibold tracking-[0.28em] text-white/55 md:text-xs">
-                  STOP TRADING CANDLES. START TRADING CULTURE.
-                </div>
-              </div>
-            </motion.div>
+              <motion.h1 variants={rise} className="mt-6 font-display text-4xl font-semibold tracking-tight text-white md:text-6xl">
+                Trade culture
+                <span className="text-white/60"> before charts.</span>
+              </motion.h1>
 
-            <motion.div variants={item} className="mb-6 flex flex-wrap items-center gap-2">
-              <Pill>
-                <Radar className="h-4 w-4 text-[var(--hs-cyan)]" />
-                Futuristic virality intelligence
-              </Pill>
-              <Pill>
-                <Activity className="h-4 w-4 text-[var(--hs-green)]" />
-                Updated every few minutes
-              </Pill>
-              <Pill>
-                <Gauge className="h-4 w-4 text-[var(--hs-lime)]" />
-                Explainable scoring
-              </Pill>
-            </motion.div>
+              <motion.p variants={rise} className="mt-5 max-w-xl text-base leading-relaxed text-white/75 md:text-lg">
+                HypeSeek is a real-time virality terminal that detects emerging narratives 1–2 hours before they hit mainstream crypto.
+              </motion.p>
 
-            <motion.h1 variants={item} className="max-w-4xl font-display text-4xl font-semibold tracking-tight text-white md:text-6xl">
-              Stop trading candles.
-              <br />
-              Start trading culture.
-            </motion.h1>
+              <motion.div variants={rise} className="mt-8 flex flex-wrap items-center gap-3">
+                <ButtonPrimary href="/live-feed">View Live Feed (No Wallet Needed)</ButtonPrimary>
+                <ButtonGhost href="/alerts">Unlock Alerts (Optional)</ButtonGhost>
+              </motion.div>
 
-            <motion.p variants={item} className="mt-5 max-w-2xl text-base leading-relaxed text-white/75 md:text-lg">
-              HypeSeek is a real-time virality terminal that detects emerging narratives 1–2 hours before they hit mainstream crypto.
-            </motion.p>
+              <motion.div variants={rise} className="mt-6 text-sm text-[var(--hs-gray)]">
+                Built for narrative traders, memecoin hunters, and cultural signal analysts.
+              </motion.div>
 
-            <motion.div variants={item} className="mt-8 flex flex-wrap items-center gap-3">
-              <GlowButton variant="primary" href="/live-feed">
-                ✅ View Live Feed (No Wallet Needed)
-              </GlowButton>
-              <GlowButton variant="secondary" href="#alerts">
-                ⭐️ Unlock Alerts (Optional Wallet)
-              </GlowButton>
-            </motion.div>
+              {/* credibility strip */}
+              <motion.div variants={rise} className="mt-10 grid grid-cols-2 gap-3 md:grid-cols-4">
+                {[
+                  { icon: <Radar className="h-4 w-4 text-[var(--hs-cyan)]" />, t: 'Realtime scanner' },
+                  { icon: <Grid2X2 className="h-4 w-4 text-[var(--hs-green)]" />, t: 'Cross-platform' },
+                  { icon: <Bell className="h-4 w-4 text-[var(--hs-amber)]" />, t: 'Alerts' },
+                  { icon: <BookOpen className="h-4 w-4 text-white/70" />, t: 'Docs + proofs' },
+                ].map((b) => (
+                  <div key={b.t} className="rounded-[18px] border border-white/10 bg-white/5 px-4 py-3 text-sm font-semibold text-white/80">
+                    <div className="flex items-center gap-2">{b.icon}{b.t}</div>
+                  </div>
+                ))}
+              </motion.div>
+            </div>
 
-            <motion.p variants={item} className="mt-5 text-sm text-[var(--hs-gray)]">
-              Built for narrative traders, memecoin hunters, and cultural signal analysts.
-            </motion.p>
-
-            <motion.div variants={item} className="mt-10 grid max-w-3xl grid-cols-1 gap-3 md:grid-cols-3">
-              <div className="hs-card rounded-[18px] p-4">
-                <div className="flex items-center gap-2 text-sm font-semibold text-white/90">
-                  <TrendingUp className="h-4 w-4 text-[var(--hs-cyan)]" />
-                  Predictive
-                </div>
-                <div className="mt-2 text-xs text-[var(--hs-gray)]">Narrative velocity before price reacts.</div>
-              </div>
-              <div className="hs-card rounded-[18px] p-4">
-                <div className="flex items-center gap-2 text-sm font-semibold text-white/90">
-                  <Grid2X2 className="h-4 w-4 text-[var(--hs-lime)]" />
-                  Multi-source
-                </div>
-                <div className="mt-2 text-xs text-[var(--hs-gray)]">X + Reddit + Google Trends confirmation.</div>
-              </div>
-              <div className="hs-card rounded-[18px] p-4">
-                <div className="flex items-center gap-2 text-sm font-semibold text-white/90">
-                  <Timer className="h-4 w-4 text-[var(--hs-green)]" />
-                  Real-time
-                </div>
-                <div className="mt-2 text-xs text-[var(--hs-gray)]">24/7 cron-driven terminal updates.</div>
-              </div>
+            <motion.div variants={rise} className="relative z-10">
+              <TerminalMock />
             </motion.div>
           </motion.div>
         </div>
       </section>
 
-      {/* SECTION 3 — LIVE PREVIEW */}
-      <section id="live-feed" className="mx-auto max-w-6xl px-4 py-16 md:px-6">
-        <SectionHeading
-          kicker="Instant proof"
-          title="Live Narratives Breaking Now"
-          subtitle="Updated every few minutes from X + Reddit + Google Trends."
-        />
-
-        <motion.div
-          variants={container}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, margin: '-80px' }}
-          className="mt-10 grid grid-cols-1 gap-4 md:grid-cols-3"
-        >
-          {[
-            {
-              title: 'AI Agents + Solana Meta',
-              score: 92,
-              velocity: '+340% last 45m',
-              sources: 'X • Reddit • Trends',
-              badge: 'BREAKING',
-              badgeTone:
-                'bg-[rgba(0,246,255,0.14)] text-[var(--hs-cyan)] border-[var(--hs-cyan)]/25',
-            },
-            {
-              title: 'Trump Meme Resurgence',
-              score: 88,
-              velocity: '+210%',
-              sources: 'X • Trends',
-              badge: 'EARLY SIGNAL',
-              badgeTone:
-                'bg-[rgba(34,211,238,0.12)] text-[var(--hs-cyan)] border-[var(--hs-cyan)]/25',
-            },
-            {
-              title: 'Epstein Files Coin Wave',
-              score: 81,
-              velocity: '+160%',
-              sources: 'X • Reddit',
-              badge: 'WATCH',
-              badgeTone:
-                'bg-[rgba(0,255,133,0.12)] text-[var(--hs-green)] border-[var(--hs-green)]/25',
-            },
-          ].map((c) => (
-            <motion.a
-              key={c.title}
-              variants={item}
-              href="#"
-              className="hs-card hs-glow group rounded-[18px] p-5 transition"
-            >
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <div className="font-display text-lg font-semibold text-white/95">{c.title}</div>
-                  <div className="mt-2">
-                    <ScoreBadge score={c.score} />
-                  </div>
-                </div>
-                <span
-                  className={`shrink-0 rounded-full border px-3 py-1 text-xs font-semibold ${c.badgeTone}`}
-                >
-                  {c.badge}
-                </span>
-              </div>
-
-              <div className="mt-4 space-y-2">
-                <Metric label="Velocity" value={c.velocity} />
-                <Metric label="Sources" value={c.sources} />
-                <div className="flex items-center justify-between pt-2 text-xs text-white/55">
-                  <span className="font-mono">click to inspect</span>
-                  <ChevronRight className="h-4 w-4 opacity-60 transition group-hover:translate-x-0.5" />
-                </div>
-              </div>
-            </motion.a>
-          ))}
-        </motion.div>
-      </section>
-
-      {/* SECTION 4 — HOW IT WORKS */}
-      <section id="how-it-works" className="mx-auto max-w-6xl px-4 py-16 md:px-6">
-        <SectionHeading kicker="Method" title="The Virality Engine" subtitle="Terminal-grade signals, built for narrative traders." />
-
-        <motion.div
-          variants={container}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, margin: '-80px' }}
-          className="mt-10 grid grid-cols-1 gap-4 md:grid-cols-3"
-        >
-          {[
-            {
-              icon: <TrendingUp className="h-5 w-5 text-[var(--hs-cyan)]" />,
-              title: '🔥 Hype Score',
-              body: 'We measure narrative velocity, engagement bursts, and breakout momentum.',
-            },
-            {
-              icon: <Grid2X2 className="h-5 w-5 text-[var(--hs-lime)]" />,
-              title: '🌍 Cross-Platform Confirmation',
-              body: 'Signals are verified across X, Reddit, and Google Trends.',
-            },
-            {
-              icon: <Sparkles className="h-5 w-5 text-[var(--hs-green)]" />,
-              title: '🧠 AI Explanation',
-              body: 'Every spike includes a “Why Now” breakdown, not just raw numbers.',
-            },
-          ].map((p) => (
-            <motion.div key={p.title} variants={item} className="hs-card rounded-[18px] p-6">
-              <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/5">
-                  {p.icon}
-                </div>
-                <div className="font-display text-lg font-semibold text-white/95">{p.title}</div>
-              </div>
-              <p className="mt-3 text-sm leading-relaxed text-[var(--hs-gray)]">{p.body}</p>
-            </motion.div>
-          ))}
-        </motion.div>
-      </section>
-
-      {/* SECTION 5 — COMPARISON */}
-      <section className="mx-auto max-w-6xl px-4 py-16 md:px-6">
+      {/* Interactive demo blocks */}
+      <section id="how" className="mx-auto w-full max-w-[1480px] px-4 py-14 md:px-6 2xl:px-8">
         <div className="mx-auto max-w-3xl text-center">
-          <p className="font-display text-2xl font-semibold tracking-tight text-white md:text-3xl">
-            DexScreener tracks tokens.{' '}
-            <span className="text-[var(--hs-cyan)]">HypeSeek tracks what moves them.</span>
+          <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-semibold text-white/70">
+            <Sparkles className="h-4 w-4 text-[var(--hs-lime)]" />
+            Instant proof
+          </div>
+          <h2 className="mt-4 font-display text-3xl font-semibold text-white md:text-4xl">
+            DexScreener-grade trust. Narrative-grade alpha.
+          </h2>
+          <p className="mt-3 text-sm text-[var(--hs-gray)] md:text-base">
+            Familiar layout, better signal: velocity, confirmation, and an explainable “Why Now”.
           </p>
         </div>
 
-        <div className="mt-10 overflow-hidden rounded-[18px] border border-white/10 bg-white/3">
-          <div className="grid grid-cols-2 gap-0 border-b border-white/10">
-            <div className="px-5 py-4 font-display text-sm font-semibold text-white/85">DexScreener</div>
-            <div className="px-5 py-4 font-display text-sm font-semibold text-white/85">HypeSeek</div>
-          </div>
-
+        <div className="mt-10 grid grid-cols-1 gap-4 lg:grid-cols-3">
           {[
-            ['Price charts', 'Narrative velocity'],
-            ['Token volume', 'Meme momentum'],
-            ['On-chain data', 'Cultural intelligence'],
-            ['Reactive', 'Predictive'],
-          ].map(([a, b]) => (
-            <div key={a} className="grid grid-cols-2 border-b border-white/7 last:border-b-0">
-              <div className="px-5 py-4 text-sm text-[var(--hs-gray)]">{a}</div>
-              <div className="px-5 py-4 text-sm text-white/85">{b}</div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* SECTION 6 — FEATURES */}
-      <section className="mx-auto max-w-6xl px-4 py-16 md:px-6">
-        <SectionHeading kicker="Toolkit" title="Built for Signal Hunters" subtitle="A Bloomberg-terminal vibe with DexScreener-grade trust." />
-
-        <motion.div
-          variants={container}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, margin: '-80px' }}
-          className="mt-10 grid grid-cols-1 gap-4 md:grid-cols-3"
-        >
-          {[
-            { icon: <Radar className="h-5 w-5 text-[var(--hs-cyan)]" />, title: 'Early narrative detection', body: 'Spot cultural moves 1–2 hours before they trend.' },
-            { icon: <TrendingUp className="h-5 w-5 text-[var(--hs-amber)]" />, title: 'Velocity trend charts', body: 'Terminal-grade momentum curves for every narrative.' },
-            { icon: <Bell className="h-5 w-5 text-[var(--hs-green)]" />, title: 'Watchlists & alerts', body: 'Track narratives, creators, and meme cycles—hands-free.' },
-            { icon: <Sparkles className="h-5 w-5 text-[var(--hs-cyan)]" />, title: 'AI breakout reasoning', body: 'Every spike includes a “Why Now” explanation.' },
-            { icon: <Grid2X2 className="h-5 w-5 text-[var(--hs-cyan)]" />, title: 'Multi-source validation', body: 'Cross-check X, Reddit, and Google Trends confirmation.' },
-            { icon: <Gauge className="h-5 w-5 text-[var(--hs-green)]" />, title: 'Meme cycle tracking', body: 'Detect repeats, remixes, and second-wave revivals.' },
-          ].map((f) => (
-            <motion.div key={f.title} variants={item} className="hs-card hs-glow rounded-[18px] p-6">
-              <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/5">
-                  {f.icon}
+            {
+              title: 'Scanner',
+              body: 'Filter by chain, status, and velocity. Spot breakouts fast.',
+              icon: <Search className="h-5 w-5 text-[var(--hs-cyan)]" />,
+              href: '/live-feed',
+            },
+            {
+              title: 'Why Now',
+              body: 'Every spike includes reasoning, not just raw numbers.',
+              icon: <Sparkles className="h-5 w-5 text-[var(--hs-lime)]" />,
+              href: '/live-feed',
+            },
+            {
+              title: 'Alerts',
+              body: 'Get pinged when a narrative crosses your thresholds.',
+              icon: <Bell className="h-5 w-5 text-[var(--hs-amber)]" />,
+              href: '/alerts',
+            },
+          ].map((c) => (
+            <div key={c.title} className="hs-card hs-glow rounded-[18px] p-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-2xl border border-white/10 bg-black/30">
+                    {c.icon}
+                  </div>
+                  <div className="font-display text-lg font-semibold text-white">{c.title}</div>
                 </div>
-                <div className="font-display text-base font-semibold text-white/95">{f.title}</div>
+                <ChevronRight className="h-5 w-5 text-white/35" />
               </div>
-              <p className="mt-3 text-sm leading-relaxed text-[var(--hs-gray)]">{f.body}</p>
-            </motion.div>
+              <div className="mt-3 text-sm text-[var(--hs-gray)]">{c.body}</div>
+              <Link href={c.href} className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-white/80 hover:text-white">
+                Open <ChevronRight className="h-4 w-4" />
+              </Link>
+            </div>
           ))}
-        </motion.div>
-      </section>
-
-      {/* SECTION 7 — WALLET OPTIONAL */}
-      <section id="alerts" className="mx-auto max-w-6xl px-4 py-16 md:px-6">
-        <div className="hs-card rounded-[18px] p-8 md:p-10">
-          <div className="flex flex-col gap-8 md:flex-row md:items-start md:justify-between">
-            <div className="max-w-2xl">
-              <h3 className="font-display text-2xl font-semibold tracking-tight text-white">Wallet is optional.</h3>
-              <p className="mt-3 text-sm leading-relaxed text-[var(--hs-gray)] md:text-base">
-                HypeSeek does not require wallet connection to explore trends. Wallet unlocks:
-              </p>
-              <ul className="mt-5 space-y-2 text-sm text-white/80">
-                <li className="flex items-center gap-2"><span className="h-1.5 w-1.5 rounded-full bg-[var(--hs-cyan)]" />Custom alerts</li>
-                <li className="flex items-center gap-2"><span className="h-1.5 w-1.5 rounded-full bg-[var(--hs-lime)]" />Personal watchlists</li>
-                <li className="flex items-center gap-2"><span className="h-1.5 w-1.5 rounded-full bg-[var(--hs-green)]" />Anti-bot protection</li>
-                <li className="flex items-center gap-2"><span className="h-1.5 w-1.5 rounded-full bg-white/60" />Future automated execution tools</li>
-              </ul>
-            </div>
-
-            <div className="flex shrink-0 flex-col gap-3">
-              <GlowButton variant="secondary" href="#alerts">⭐️ Unlock Alerts</GlowButton>
-              <div className="text-xs text-white/55">No wallet gating on the live feed.</div>
-            </div>
-          </div>
         </div>
       </section>
 
-      {/* SECTION 8 — FINAL CTA */}
-      <section className="mx-auto max-w-6xl px-4 py-16 md:px-6">
-        <div className="relative overflow-hidden rounded-[18px] border border-white/10 bg-gradient-to-b from-white/6 to-white/2 p-10">
-          <div className="absolute inset-0 opacity-60"><div className="radar" /></div>
-          <div className="relative z-10">
-            <h3 className="max-w-3xl font-display text-3xl font-semibold tracking-tight text-white md:text-4xl">
-              Culture moves before charts. Don’t trade late.
-            </h3>
-            <div className="mt-6 flex flex-wrap items-center gap-3">
-              <GlowButton variant="primary" href="/live-feed">✅ View Live Feed</GlowButton>
-              <GlowButton variant="secondary" href="#alerts">⭐️ Unlock Alerts</GlowButton>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* SECTION 9 — FOOTER */}
+      {/* Footer */}
       <footer className="border-t border-white/10 bg-black/30">
-        <div className="mx-auto flex max-w-6xl flex-col gap-4 px-4 py-10 md:flex-row md:items-center md:justify-between md:px-6">
+        <div className="mx-auto flex w-full max-w-[1480px] flex-col gap-4 px-4 py-10 md:flex-row md:items-center md:justify-between md:px-6 2xl:px-8">
           <div className="text-sm text-white/70">HypeSeek © 2026</div>
           <div className="flex items-center gap-5 text-sm text-white/60">
-            <a href="#docs" className="inline-flex items-center gap-2 hover:text-white">
-              <BookOpen className="h-4 w-4" /> Docs
-            </a>
+            <Link href="/docs" className="hover:text-white">Docs</Link>
             <a href="https://x.com/HypeSeekAI" target="_blank" rel="noreferrer" className="hover:text-white">
               X/Twitter
             </a>
-            <a href="#privacy" className="hover:text-white">Privacy</a>
+            <Link href="#privacy" className="hover:text-white">Privacy</Link>
           </div>
         </div>
       </footer>
-
-      <div id="docs" />
-      <div id="sign-in" />
     </div>
   )
 }
