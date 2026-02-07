@@ -19,6 +19,7 @@ import {
 import { useEffect, useMemo, useState } from 'react'
 import { MobileBottomNav } from '@/components/MobileNav'
 import { MobileInspectorDrawer } from '@/components/MobileInspector'
+import { Modal } from '@/components/ui/Modal'
 
 type Narrative = {
   id: string
@@ -554,6 +555,102 @@ function mockSpark(n: Narrative) {
   return pts
 }
 
+function MobileNarrativeCard({
+  n,
+  selected,
+  onSelect,
+}: {
+  n: Narrative
+  selected: boolean
+  onSelect: () => void
+}) {
+  const [expanded, setExpanded] = useState(false)
+  const s = safeScore(n.score)
+  const label = scoreLabel(n.score)
+  const hot = label === 'BREAKING'
+  const vel = n.velocityPct
+  const velTone = vel >= 250 ? 'text-[var(--hs-cyan)]' : vel >= 180 ? 'text-[var(--hs-amber)]' : 'text-white/80'
+
+  return (
+    <div
+      className={`group relative mb-3 overflow-hidden rounded-[18px] border transition-all ${
+        selected ? 'border-[var(--hs-cyan)]/40 bg-[rgba(0,246,255,0.06)]' : 'border-white/10 bg-white/5'
+      }`}
+    >
+      <div className="p-4" onClick={onSelect}>
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex items-center gap-3 min-w-0">
+            <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-black/30">
+              <Flame className={`h-4 w-4 ${hot ? 'text-[var(--hs-cyan)]' : 'text-white/55'}`} />
+            </span>
+            <div className="min-w-0">
+              <div className="font-display text-sm font-semibold text-white/90 truncate">
+                {n.title}
+              </div>
+              <div className="mt-1 flex items-center gap-2 text-[10px] text-white/50">
+                <span className="rounded-full border border-white/10 bg-white/5 px-2 py-0.5">{n.chain ?? '—'}</span>
+                <span className="truncate">{n.tags.slice(0, 2).join(' · ')}</span>
+              </div>
+            </div>
+          </div>
+          <div className="text-right shrink-0">
+            <div className={`font-mono text-sm font-bold ${scoreTone(n.score)}`}>
+              {s === null ? '—' : `${s}/100`}
+            </div>
+            <div className="text-[10px] font-bold text-white/40">{label}</div>
+          </div>
+        </div>
+
+        <div className="mt-4 grid grid-cols-2 items-center gap-4">
+          <div>
+            <div className="text-[10px] font-bold tracking-wider text-white/30">VELOCITY</div>
+            <div className={`font-mono text-lg font-bold ${velTone}`}>+{n.velocityPct}%</div>
+          </div>
+          <div className="flex justify-end">
+            <Sparkline points={mockSpark(n)} />
+          </div>
+        </div>
+
+        <div className="mt-4 flex items-center justify-between border-t border-white/5 pt-3">
+          <div className="flex items-center gap-2 overflow-hidden">
+            <Search className="h-3 w-3 shrink-0 text-white/30" />
+            <div className="truncate text-[10px] text-white/50">{n.sources.join(' • ')}</div>
+          </div>
+          <div className="text-[10px] text-white/30">{n.updatedAgo}</div>
+        </div>
+      </div>
+
+      <button
+        onClick={(e) => {
+          e.stopPropagation()
+          setExpanded(!expanded)
+        }}
+        className="flex w-full items-center justify-between border-t border-white/5 bg-white/[0.02] px-4 py-2 text-[10px] font-bold text-white/40 hover:text-white/70"
+      >
+        <span>WHY THIS IS MOVING</span>
+        <ChevronDown className={`h-3 w-3 transition-transform ${expanded ? 'rotate-180' : ''}`} />
+      </button>
+
+      <motion.div
+        initial={false}
+        animate={{ height: expanded ? 'auto' : 0, opacity: expanded ? 1 : 0 }}
+        className="overflow-hidden bg-black/20"
+      >
+        <div className="p-4 pt-2">
+          <ul className="space-y-2 text-[11px] leading-relaxed text-white/70">
+            {n.whyNow.map((w, i) => (
+              <li key={i} className="flex items-start gap-2">
+                <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-[var(--hs-cyan)]" />
+                <span>{w}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </motion.div>
+    </div>
+  )
+}
+
 function Row({
   n,
   selected,
@@ -572,7 +669,7 @@ function Row({
   return (
     <motion.button
       onClick={onSelect}
-      className={`group grid w-full min-w-0 grid-cols-[minmax(0,1.6fr)_minmax(0,0.85fr)_minmax(0,0.8fr)_minmax(0,0.9fr)_minmax(0,0.9fr)_minmax(0,0.7fr)_minmax(0,0.9fr)] items-center border-t border-white/6 px-3 py-3 text-left transition hover:bg-white/4 ${
+      className={`group grid w-full min-w-[1100px] grid-cols-[minmax(0,1.6fr)_minmax(0,0.85fr)_minmax(0,0.8fr)_minmax(0,0.9fr)_minmax(0,0.9fr)_minmax(0,0.7fr)_minmax(0,0.9fr)] items-center border-t border-white/6 px-3 py-3 text-left transition hover:bg-white/4 ${
         selected ? 'bg-[rgba(0,246,255,0.06)]' : ''
       }`}
       whileHover={{ x: 2 }}
@@ -640,6 +737,8 @@ export function LiveFeedDashboard() {
   const [sortVel, setSortVel] = useState<'DESC' | 'ASC'>('DESC')
   const [selectedId, setSelectedId] = useState<string | null>('n1')
   const [mobileInspectorOpen, setMobileInspectorOpen] = useState(false)
+  const [columnsOpen, setColumnsOpen] = useState(false)
+  const [proOpen, setProOpen] = useState(false)
 
   useEffect(() => {
     const t = setTimeout(() => setReady(true), 850)
@@ -682,7 +781,7 @@ export function LiveFeedDashboard() {
   const rotateY = useTransform(bx, [-40, 40], [-6, 6])
 
   return (
-    <div className="relative z-10 min-h-screen pb-20 lg:pb-0">
+    <div className="relative z-10 min-h-screen pb-24 lg:pb-0">
       <Preloader done={ready} />
 
       <AuthModal
@@ -702,29 +801,48 @@ export function LiveFeedDashboard() {
         <div className="min-h-screen w-full min-w-0 overflow-x-hidden">
           {/* Top bar */}
           <div className="sticky top-0 z-40 border-b border-white/10 bg-black/55 backdrop-blur-xl">
-            <div className="mx-auto flex w-full max-w-full items-center justify-between gap-4 px-4 py-3 md:px-6 2xl:px-8">
-              <div className="flex items-center gap-3">
-                <div className="hidden items-center gap-2 md:flex">
+            <div className="mx-auto flex w-full max-w-full items-center justify-between gap-3 px-3 py-3 md:px-6 2xl:px-8">
+              {/* Mobile branding */}
+              <div className="flex items-center gap-2 md:hidden">
+                <img
+                  src="/brand/hypeseek-icon.jpg"
+                  alt="HypeSeek"
+                  className="h-8 w-8 rounded-lg border border-white/10 object-cover"
+                />
+                <div>
+                  <div className="text-xs font-semibold text-white">HypeSeek</div>
+                  <div className="flex items-center gap-1.5 text-[10px] text-white/50">
+                    <PulsingDot tone="cyan" />
+                    <span>LIVE</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Desktop branding */}
+              <div className="hidden items-center gap-3 md:flex">
+                <div className="flex items-center gap-2">
                   <PulsingDot tone="cyan" />
                   <div className="text-sm font-semibold text-white/85">Live Feed</div>
                 </div>
 
-                <div className="hidden items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-2 text-sm text-white/70 md:inline-flex">
+                <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-2 text-sm text-white/70">
                   <TrendingUp className="h-4 w-4 text-[var(--hs-cyan)]" />
                   Updated every few minutes
                 </div>
               </div>
 
-              <div className="flex w-full max-w-xl items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2">
-                <Search className="h-4 w-4 text-white/55" />
+              {/* Search bar - responsive */}
+              <div className="flex flex-1 items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-2 md:max-w-xl md:px-4">
+                <Search className="h-4 w-4 shrink-0 text-white/55" />
                 <input
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
-                  placeholder="Search narratives / tags / sources"
-                  className="w-full bg-transparent text-sm text-white/85 placeholder:text-white/35 focus:outline-none"
+                  placeholder="Search..."
+                  className="w-full min-w-0 bg-transparent text-sm text-white/85 placeholder:text-white/35 focus:outline-none"
                 />
               </div>
 
+              {/* Desktop theme button */}
               <div className="hidden items-center gap-2 md:flex">
                 <button className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-white/80 hover:bg-white/7">
                   <Moon className="h-4 w-4" />
@@ -754,8 +872,8 @@ export function LiveFeedDashboard() {
                     bannerX.set(0)
                     bannerY.set(0)
                   }}
-                  style={{ rotateX, rotateY, transformStyle: 'preserve-3d' }}
-                  className="hs-card relative overflow-hidden rounded-[18px] p-6"
+                  style={{ rotateX, rotateY, transformStyle: 'preserve-3d', willChange: 'transform' }}
+                  className="hs-card relative overflow-hidden rounded-[18px] p-4 md:p-6"
                 >
                   <div className="absolute inset-0 opacity-60">
                     <div className="radar" />
@@ -885,7 +1003,117 @@ export function LiveFeedDashboard() {
 
               {/* Main Dex-like grid: table + right panel */}
               <motion.div variants={item} className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1.8fr)_minmax(0,1fr)]">
-                <div className="hs-card overflow-hidden rounded-[18px]">
+                {/* Mobile feed */}
+                <div className="hs-card overflow-hidden rounded-[18px] lg:hidden">
+                  <div className="border-b border-white/8 bg-black/35 px-4 py-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2 text-sm font-semibold text-white/85">
+                        <Radar className="h-4 w-4 text-[var(--hs-cyan)]" />
+                        Narratives
+                      </div>
+                      <button
+                        onClick={() => setProOpen(true)}
+                        className="rounded-full border border-white/10 bg-white/5 px-3 py-2 text-xs font-semibold text-white/75"
+                      >
+                        ⭐️ Alerts
+                      </button>
+                    </div>
+
+                    <div className="mt-3 flex flex-wrap items-center gap-2">
+                      {(['ALL', 'X', 'Reddit', 'Trends'] as const).map((p) => (
+                        <button
+                          key={p}
+                          onClick={() => setPlatform(p)}
+                          className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
+                            platform === p
+                              ? 'border-[var(--hs-cyan)]/30 bg-[rgba(0,246,255,0.10)] text-white'
+                              : 'border-white/10 bg-white/5 text-white/70'
+                          }`}
+                        >
+                          {p}
+                        </button>
+                      ))}
+                      {(['ALL', 'BREAKING', 'EARLY SIGNAL', 'WATCH'] as const).map((s) => (
+                        <button
+                          key={s}
+                          onClick={() => setStatus(s)}
+                          className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
+                            status === s
+                              ? 'border-[var(--hs-cyan)]/30 bg-[rgba(0,246,255,0.10)] text-white'
+                              : 'border-white/10 bg-white/5 text-white/70'
+                          }`}
+                        >
+                          {s === 'EARLY SIGNAL' ? 'EARLY' : s}
+                        </button>
+                      ))}
+                      <button
+                        onClick={() => setSortVel((v) => (v === 'DESC' ? 'ASC' : 'DESC'))}
+                        className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-semibold text-white/80"
+                      >
+                        Vel {sortVel === 'DESC' ? '↓' : '↑'}
+                      </button>
+                    </div>
+
+                    <div className="relative mt-3">
+                      <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-white/40" />
+                      <input
+                        value={query}
+                        onChange={(e) => setQuery(e.target.value)}
+                        placeholder="Search narratives"
+                        className="w-full rounded-full border border-white/10 bg-white/5 py-2 pl-9 pr-3 text-sm text-white/85 placeholder:text-white/35 outline-none focus:border-[var(--hs-cyan)]/35"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="divide-y divide-white/6">
+                    {data.map((n) => {
+                      const s = safeScore(n.score)
+                      const label = scoreLabel(n.score)
+                      return (
+                        <button
+                          key={n.id}
+                          onClick={() => {
+                            setSelectedId(n.id)
+                            setMobileInspectorOpen(true)
+                          }}
+                          className="w-full px-4 py-4 text-left hover:bg-white/4"
+                        >
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="min-w-0">
+                              <div className="truncate font-display text-sm font-semibold text-white/90">{n.title}</div>
+                              <div className="mt-2 flex flex-wrap items-center gap-2">
+                                <span className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-semibold ${scoreBadgeTone(label)}`}>
+                                  <span className="h-1.5 w-1.5 rounded-full bg-current opacity-80" />
+                                  {s === null ? '—' : `${s}/100`} • {label}
+                                </span>
+                                <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-semibold text-white/70">
+                                  +{n.velocityPct}%
+                                </span>
+                              </div>
+                            </div>
+                            <div className="shrink-0">
+                              <Sparkline points={mockSpark(n)} />
+                            </div>
+                          </div>
+
+                          <div className="mt-3 text-xs text-white/60">{n.sources.join(' • ')}</div>
+
+                          <div className="mt-2 text-[11px] text-white/45">Why this is moving →</div>
+                          <div className="mt-0.5 line-clamp-2 text-[11px] text-white/55 italic">
+                            Engagement burst in the last 18 minutes + confirmed Reddit spike.
+                          </div>
+                        </button>
+                      )
+                    })}
+
+                    {data.length === 0 ? (
+                      <div className="px-4 py-10 text-sm text-[var(--hs-gray)]">No results.</div>
+                    ) : null}
+                  </div>
+                </div>
+
+                {/* Desktop table */}
+                <div className="hs-card relative hidden overflow-hidden rounded-[18px] lg:block">
                   <div className="border-b border-white/8 bg-black/35">
                     <div className="flex items-center justify-between px-3 py-3">
                       <div className="flex items-center gap-2 text-sm font-semibold text-white/85">
@@ -893,11 +1121,17 @@ export function LiveFeedDashboard() {
                         Narratives
                       </div>
                       <div className="flex items-center gap-2">
-                        <button className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-2 text-xs font-semibold text-white/70 hover:bg-white/7">
+                        <button
+                          onClick={() => setColumnsOpen(true)}
+                          className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-2 text-xs font-semibold text-white/70 hover:bg-white/7"
+                        >
                           <Settings className="h-4 w-4" />
                           Columns
                         </button>
-                        <button className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-2 text-xs font-semibold text-white/70 hover:bg-white/7">
+                        <button
+                          onClick={() => setProOpen(true)}
+                          className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-2 text-xs font-semibold text-white/70 hover:bg-white/7"
+                        >
                           <Lock className="h-4 w-4" />
                           Pro
                         </button>
@@ -905,7 +1139,7 @@ export function LiveFeedDashboard() {
                     </div>
 
                     {/* 5) Filter + sort bar (Dex-style) */}
-                    <div className="sticky top-[56px] z-30 border-t border-white/8 bg-black/55 px-3 py-3 backdrop-blur-xl">
+                    <div className="border-t border-white/8 bg-black/35 px-3 py-3">
                       <div className="flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between">
                         <div className="flex flex-wrap items-center gap-2">
                           <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-2 text-xs font-semibold text-white/75">
@@ -965,7 +1199,7 @@ export function LiveFeedDashboard() {
                       </div>
                     </div>
 
-                    <div className="grid min-w-0 grid-cols-[minmax(0,1.6fr)_minmax(0,0.85fr)_minmax(0,0.8fr)_minmax(0,0.9fr)_minmax(0,0.9fr)_minmax(0,0.7fr)_minmax(0,0.9fr)] border-t border-white/8">
+                    <div className="grid min-w-[1100px] grid-cols-[minmax(0,1.6fr)_minmax(0,0.85fr)_minmax(0,0.8fr)_minmax(0,0.9fr)_minmax(0,0.9fr)_minmax(0,0.7fr)_minmax(0,0.9fr)] border-t border-white/8">
                       <TableHeader label="NARRATIVE" />
                       <TableHeader label="SCORE" />
                       <TableHeader label="VELOCITY" />
@@ -976,7 +1210,7 @@ export function LiveFeedDashboard() {
                     </div>
                   </div>
 
-                  <motion.div variants={container} initial="hidden" animate="show">
+                  <motion.div variants={container} initial="hidden" animate="show" className="min-w-[1100px] overflow-x-auto">
                     {data.map((n) => (
                       <Row
                         key={n.id}
@@ -1003,6 +1237,44 @@ export function LiveFeedDashboard() {
           </main>
         </div>
       </div>
+
+      {/* Modals (UI-only) */}
+      <Modal open={columnsOpen} onClose={() => setColumnsOpen(false)} title="Columns">
+        <div className="space-y-3">
+          <div className="text-white/70">UI-only for now. Backend wiring later.</div>
+          <div className="grid grid-cols-2 gap-2 text-xs">
+            {['Score', 'Velocity', 'Trend', 'Sources', 'Updated', 'Status'].map((c) => (
+              <div key={c} className="rounded-full border border-white/10 bg-white/5 px-3 py-2 text-white/80">
+                {c}
+              </div>
+            ))}
+          </div>
+          <div className="text-xs text-white/45">(Coming next: persist column prefs in local storage.)</div>
+        </div>
+      </Modal>
+
+      <Modal open={proOpen} onClose={() => setProOpen(false)} title="Unlock Alerts (Optional)">
+        <div className="space-y-3">
+          <div className="text-white/80">
+            Wallet is only used for alerts + watchlists. Not required to view trends.
+          </div>
+          <ul className="space-y-2 text-sm text-white/75">
+            <li>• Alerts</li>
+            <li>• Personal watchlists</li>
+            <li>• Anti-bot protection</li>
+            <li>• Future automation tools</li>
+          </ul>
+          <button
+            onClick={() => {
+              setProOpen(false)
+              setActiveTab('alerts')
+            }}
+            className="w-full rounded-full bg-[var(--hs-cyan)] px-4 py-3 text-sm font-semibold text-black"
+          >
+            Go to Alerts
+          </button>
+        </div>
+      </Modal>
 
       {/* Mobile inspector drawer */}
       <MobileInspectorDrawer
