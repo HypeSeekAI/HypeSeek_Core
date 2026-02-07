@@ -5,7 +5,8 @@
   --hs-green: #00ff85;
   --hs-lime: #b6ff00;
   --hs-cyan: #00f6ff;
-  --hs-hot: #ff2bd6;
+  /* no pink */
+  --hs-teal: #2dd4bf;
   --hs-amber: #ffb800;
   --hs-red: #ff3d3d;
   --hs-gray: #a1a1aa;

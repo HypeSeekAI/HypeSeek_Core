@@ -123,21 +123,21 @@ function badgeTone(status: Narrative['status']) {
     return 'bg-[rgba(0,246,255,0.14)] text-[var(--hs-cyan)] border-[var(--hs-cyan)]/25'
   }
   if (status === 'EARLY SIGNAL') {
-    return 'bg-[rgba(255,43,214,0.14)] text-[var(--hs-hot)] border-[var(--hs-hot)]/25'
+    return 'bg-[rgba(34,211,238,0.12)] text-[var(--hs-cyan)] border-[var(--hs-cyan)]/25'
   }
   return 'bg-[rgba(0,255,133,0.12)] text-[var(--hs-green)] border-[var(--hs-green)]/25'
 }
 
 function scoreTone(score: number) {
   if (score >= 90) return 'text-[var(--hs-cyan)]'
-  if (score >= 85) return 'text-[var(--hs-hot)]'
+  if (score >= 85) return 'text-[var(--hs-lime)]'
   return 'text-white/80'
 }
 
 function PulsingDot({ tone = 'cyan' }: { tone?: 'cyan' | 'purple' | 'green' }) {
   const c =
     tone === 'purple'
-      ? 'bg-[var(--hs-hot)]'
+      ? 'bg-[var(--hs-lime)]'
       : tone === 'green'
         ? 'bg-[var(--hs-green)]'
         : 'bg-[var(--hs-cyan)]'
@@ -405,7 +405,7 @@ function RightPanel({ n }: { n: Narrative | null }) {
       <div className="hs-card rounded-[18px] p-5">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 text-sm font-semibold text-white/85">
-            <Sparkles className="h-4 w-4 text-[var(--hs-hot)]" />
+            <Sparkles className="h-4 w-4 text-[var(--hs-lime)]" />
             Narrative
           </div>
           <span className="text-xs text-white/45">Inspector</span>
@@ -487,7 +487,7 @@ function Row({
 }) {
   const hot = n.score >= 90
   const vel = n.velocityPct
-  const velTone = vel >= 250 ? 'text-[var(--hs-cyan)]' : vel >= 180 ? 'text-[var(--hs-hot)]' : 'text-white/80'
+  const velTone = vel >= 250 ? 'text-[var(--hs-cyan)]' : vel >= 180 ? 'text-[var(--hs-amber)]' : 'text-white/80'
 
   return (
     <motion.button
@@ -679,7 +679,7 @@ export function LiveFeedDashboard() {
 
                     <div className="mt-5 flex flex-wrap items-center gap-2">
                       <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-2 text-sm font-semibold text-white/80">
-                        <Flame className="h-4 w-4 text-[var(--hs-hot)]" />
+                        <Flame className="h-4 w-4 text-[var(--hs-amber)]" />
                         Breakouts: {seed.filter((s) => s.status === 'BREAKING').length}
                       </span>
                       <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-2 text-sm font-semibold text-white/80">

@@ -30,7 +30,7 @@ export function MobileInspectorDrawer({
       >
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 text-sm font-semibold text-white/85">
-            <Sparkles className="h-4 w-4 text-[var(--hs-hot)]" />
+            <Sparkles className="h-4 w-4 text-[var(--hs-lime)]" />
             {title}
           </div>
           <button
