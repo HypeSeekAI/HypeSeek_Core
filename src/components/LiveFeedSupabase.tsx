@@ -92,7 +92,7 @@ export function LiveFeedSupabase() {
 
       {rows.length === 0 ? (
         <div className="p-6 text-sm text-white/60">
-          No imported posts yet. Use the manual Grok run → paste IDs → we import.
+          No imported posts yet. Run a Grok scan and paste the IDs → we import.
         </div>
       ) : (
         <div className="divide-y divide-white/5">
