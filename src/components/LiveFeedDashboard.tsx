@@ -17,6 +17,7 @@ import {
   TrendingUp,
 } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
+import { supabase } from '@/lib/supabase'
 import { MobileBottomNav } from '@/components/MobileNav'
 import { MobileInspectorDrawer } from '@/components/MobileInspector'
 import { Modal } from '@/components/ui/Modal'
@@ -36,8 +37,63 @@ type Narrative = {
 }
 
 // No hardcoded seed data (hackathon rule: real data only).
-// This dashboard is the UI shell; wire it to Supabase data next.
 const seed: Narrative[] = []
+
+type TrendingPostRow = {
+  id: string
+  post_id: string
+  author_handle: string
+  content_snippet: string | null
+  predicted_at: string | null
+  prediction_confidence: number | null
+  reasoning: string | null
+  content_type: string | null
+  status: string | null
+  hype_score: number | null
+  velocity: number | null
+  metadata: any | null
+  created_at: string | null
+  updated_at: string | null
+}
+
+function toXUrl(postId: string) {
+  return `https://x.com/i/web/status/${postId}`
+}
+
+function statusFromRow(r: TrendingPostRow): Narrative['status'] {
+  const s = (r.status ?? '').toUpperCase()
+  if (s.includes('BREAK')) return 'BREAKING'
+  if (s.includes('EARLY')) return 'EARLY SIGNAL'
+  if (s.includes('WATCH')) return 'WATCH'
+  // fall back based on score
+  const score = r.hype_score ?? 0
+  if (score >= 80) return 'BREAKING'
+  if (score >= 60) return 'EARLY SIGNAL'
+  return 'WATCH'
+}
+
+function asNarrative(r: TrendingPostRow): Narrative {
+  const score = typeof r.hype_score === 'number' ? Math.max(0, Math.min(100, r.hype_score)) : undefined
+  const vel = typeof r.velocity === 'number' ? Math.round(r.velocity) : 0
+
+  const meta = r.metadata ?? {}
+  const match = meta.match ?? meta.grok_match ?? null
+  const window = meta.window ?? meta.window_m ?? meta.windowMinutes ?? null
+
+  return {
+    id: r.id,
+    title: r.content_snippet?.slice(0, 80) || `@${r.author_handle}`,
+    score,
+    velocityPct: vel || 0,
+    window: window ? String(window) : '—',
+    sources: Array.isArray(meta.sources) ? meta.sources : ['X'],
+    status: statusFromRow(r),
+    whyNow: (r.reasoning ? [r.reasoning] : []).concat(Array.isArray(meta.whyNow) ? meta.whyNow : []),
+    tags: Array.isArray(meta.tags) ? meta.tags : [],
+    updatedAgo: r.predicted_at ? new Date(r.predicted_at).toLocaleString() : '—',
+    chain: meta.chain ?? undefined,
+  }
+}
 
 const container: any = {
   hidden: { opacity: 0 },
@@ -673,6 +729,41 @@ export function LiveFeedDashboard() {
   const [columnsOpen, setColumnsOpen] = useState(false)
   const [proOpen, setProOpen] = useState(false)
 
+  const [rows, setRows] = useState<TrendingPostRow[]>([])
+  const [loadErr, setLoadErr] = useState<string | null>(null)
+
+  useEffect(() => {
+    let cancelled = false
+
+    async function load() {
+      const res = await supabase
+        .from('trending_posts')
+        .select('*')
+        .order('predicted_at', { ascending: false })
+        .limit(200)
+
+      if (res.error) {
+        if (!cancelled) {
+          setLoadErr(res.error.message)
+          setRows([])
+        }
+        return
+      }
+
+      if (!cancelled) {
+        setLoadErr(null)
+        setRows((res.data ?? []) as any)
+      }
+    }
+
+    load()
+    const t = setInterval(load, 30_000)
+    return () => {
+      cancelled = true
+      clearInterval(t)
+    }
+  }, [])
+
   useEffect(() => {
     const t = setTimeout(() => setReady(true), 850)
     return () => clearTimeout(t)
@@ -680,7 +771,7 @@ export function LiveFeedDashboard() {
 
   const data = useMemo(() => {
     const q = query.trim().toLowerCase()
-    return seed
+    return rows.map(asNarrative)
       .filter((n) => (chain === 'ALL' ? true : (n.chain ?? '—') === chain))
       .filter((n) => {
         if (platform === 'ALL') return true
@@ -704,7 +795,7 @@ export function LiveFeedDashboard() {
       })
   }, [query, status, chain, platform, sortVel])
 
-  const selected = useMemo(() => seed.find((n) => n.id === selectedId) ?? null, [selectedId])
+  const selected = useMemo(() => data.find((n) => n.id === selectedId) ?? null, [data, selectedId])
 
   const bannerX = useMotionValue(0)
   const bannerY = useMotionValue(0)
