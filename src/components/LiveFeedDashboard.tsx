@@ -1145,7 +1145,7 @@ export function LiveFeedDashboard() {
                   </div>
                 </div>
 
-                {/* Desktop table */}}
+                {/* Desktop table */}
                 <div className="hs-card relative hidden overflow-hidden rounded-[18px] lg:block">
                   <div className="border-b border-white/8 bg-black/35">
                     <div className="flex items-center justify-between px-3 py-3">
