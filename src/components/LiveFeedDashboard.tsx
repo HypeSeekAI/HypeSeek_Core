@@ -793,7 +793,7 @@ export function LiveFeedDashboard() {
         if (sortVel === 'ASC') return a.velocityPct - b.velocityPct
         return b.velocityPct - a.velocityPct
       })
-  }, [query, status, chain, platform, sortVel])
+  }, [rows, query, status, chain, platform, sortVel])
 
   const selected = useMemo(() => data.find((n) => n.id === selectedId) ?? null, [data, selectedId])
 
@@ -1131,12 +1131,21 @@ export function LiveFeedDashboard() {
                     })}
 
                     {data.length === 0 ? (
-                      <div className="px-4 py-10 text-sm text-[var(--hs-gray)]">No results.</div>
+                      <div className="px-4 py-10">
+                        {loadErr ? (
+                          <div className="rounded-[18px] border border-red-500/30 bg-red-500/10 p-4">
+                            <div className="font-semibold text-red-400">Error loading data:</div>
+                            <div className="mt-2 text-sm text-red-300">{loadErr}</div>
+                          </div>
+                        ) : (
+                          <div className="text-sm text-[var(--hs-gray)]">No results.</div>
+                        )}
+                      </div>
                     ) : null}
                   </div>
                 </div>
 
-                {/* Desktop table */}
+                {/* Desktop table */}}
                 <div className="hs-card relative hidden overflow-hidden rounded-[18px] lg:block">
                   <div className="border-b border-white/8 bg-black/35">
                     <div className="flex items-center justify-between px-3 py-3">
@@ -1248,7 +1257,16 @@ export function LiveFeedDashboard() {
                     ))}
 
                     {data.length === 0 ? (
-                      <div className="px-6 py-10 text-sm text-[var(--hs-gray)]">No results.</div>
+                      <div className="px-6 py-10">
+                        {loadErr ? (
+                          <div className="rounded-[18px] border border-red-500/30 bg-red-500/10 p-4">
+                            <div className="font-semibold text-red-400">Error loading data:</div>
+                            <div className="mt-2 text-sm text-red-300">{loadErr}</div>
+                          </div>
+                        ) : (
+                          <div className="text-sm text-[var(--hs-gray)]">No results.</div>
+                        )}
+                      </div>
                     ) : null}
                   </motion.div>
                 </div>
