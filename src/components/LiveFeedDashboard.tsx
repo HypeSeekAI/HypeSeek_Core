@@ -35,76 +35,9 @@ type Narrative = {
   chain?: string
 }
 
-// Static seed (UI first). Next step: Supabase wiring.
-const seed: Narrative[] = [
-  {
-    id: 'n1',
-    title: 'AI Agents + Solana Meta',
-    score: 92,
-    velocityPct: 340,
-    window: '45m',
-    sources: ['X', 'Reddit', 'Trends'],
-    status: 'BREAKING',
-    whyNow: [
-      'Spike in repost velocity + reply density on Tier-1 accounts',
-      'Cross-platform confirmation: Reddit thread + Trends breakout',
-      'Format signal: short caption + screenshot meme variant',
-    ],
-    tags: ['ai', 'solana', 'agents'],
-    updatedAgo: '2m',
-    chain: 'SOL',
-  },
-  {
-    id: 'n2',
-    title: 'Trump Meme Resurgence',
-    score: 88,
-    velocityPct: 210,
-    window: '60m',
-    sources: ['X', 'Trends'],
-    status: 'EARLY SIGNAL',
-    whyNow: [
-      'High engagement per impression on political humor posts',
-      'Format signal: quote-tweet chains accelerating',
-      'Trend confirmation: short-lived dip then renewed climb',
-    ],
-    tags: ['meme', 'politics', 'culture'],
-    updatedAgo: '4m',
-    chain: 'ETH',
-  },
-  {
-    id: 'n3',
-    title: 'Epstein Files Coin Wave',
-    score: 81,
-    velocityPct: 160,
-    window: '90m',
-    sources: ['X', 'Reddit'],
-    status: 'WATCH',
-    whyNow: [
-      'New documentary clip causing re-share cascade',
-      'Reddit mentions increasing across multiple subs',
-      'Tokenized narrative chatter detected (memecoin tickers)',
-    ],
-    tags: ['meme', 'news', 'attention'],
-    updatedAgo: '7m',
-    chain: 'SOL',
-  },
-  {
-    id: 'n4',
-    title: 'Streamer Clip: “One Frame” Challenge',
-    score: 77,
-    velocityPct: 120,
-    window: '2h',
-    sources: ['X', 'Trends'],
-    status: 'WATCH',
-    whyNow: [
-      'Short-form clip format performing unusually well',
-      'Influencer graph overlap suggests second-wave amplification',
-    ],
-    tags: ['streamers', 'clips', 'challenge'],
-    updatedAgo: '10m',
-    chain: 'BASE',
-  },
-]
+// No hardcoded seed data (hackathon rule: real data only).
+// This dashboard is the UI shell; wire it to Supabase data next.
+const seed: Narrative[] = []
 
 const container: any = {
   hidden: { opacity: 0 },
@@ -735,7 +668,7 @@ export function LiveFeedDashboard() {
   const [platform, setPlatform] = useState<'ALL' | 'X' | 'Reddit' | 'Trends'>('ALL')
   const [status, setStatus] = useState<'ALL' | 'BREAKING' | 'EARLY SIGNAL' | 'WATCH'>('ALL')
   const [sortVel, setSortVel] = useState<'DESC' | 'ASC'>('DESC')
-  const [selectedId, setSelectedId] = useState<string | null>('n1')
+  const [selectedId, setSelectedId] = useState<string | null>(null)
   const [mobileInspectorOpen, setMobileInspectorOpen] = useState(false)
   const [columnsOpen, setColumnsOpen] = useState(false)
   const [proOpen, setProOpen] = useState(false)
