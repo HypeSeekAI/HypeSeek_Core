@@ -1,0 +1,13 @@
+--- a/src/index.css
++++ b/src/index.css
+@@ -60,7 +60,8 @@
+ 
+ .hs-glow:hover {
+   border-color: rgba(0, 246, 255, 0.30);
++  will-change: transform, box-shadow;
+   box-shadow:
+     0 0 0 1px rgba(0, 246, 255, 0.16),
+     0 18px 80px rgba(0, 0, 0, 0.55),
+     0 0 48px rgba(0, 246, 255, 0.10);
++  transform: translateZ(0); /* Force GPU layer */
+ }
